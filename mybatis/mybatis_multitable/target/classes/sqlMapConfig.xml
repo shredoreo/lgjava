@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+    <properties resource="jdbc.properties"/>
+
+    <!--给实体类的全类名起别名-->
+    <typeAliases>
+        <!--批量给包下的类起别名，且不区分大小写-->
+        <package name="com.shred.pojo"/>
+        <!--单个类起别名-->
+<!--        <typeAlias type="com.shred.pojo.User" alias="user"/>-->
+    </typeAliases>
+
+
+    <environments default="development">
+        <environment id="development">
+            <!--当前事务有JDBC管理-->
+            <transactionManager type="JDBC"/>
+            <dataSource type="POOLED">
+                <property name="driver" value="${jdbc.driver}"/>
+                <property name="url" value="${jdbc.url}"/>
+                <property name="username" value="${jdbc.username}"/>
+                <property name="password" value="${jdbc.password}"/>
+            </dataSource>
+        </environment>
+    </environments>
+    <mappers>
+        <!--引入注解类-->
+<!--        <mapper class="com.shred.mapper.IUserMapper"/>-->
+        <!--使用package方式，要求mapper.xml所在的文件目录跟Mapper类的目录一样-->
+        <package name="com.shred.mapper"/>
+    </mappers>
+</configuration>

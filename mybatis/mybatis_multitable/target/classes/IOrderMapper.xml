@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.shred.mapper.IOrderMapper">
+
+    <resultMap id="orderMap" type="order">
+        <!--column 表字段  property javaBean字段-->
+        <result column="id" property="id"/>
+        <result column="orderTime" property="orderTime"/>
+        <result column="total" property="total"/>
+
+        <!--使用association标签 映射java实体 javaType指定属性的类型-->
+        <association property="user" javaType="user">
+            <result property="id" column="uid"/>
+            <result property="username" column="username"/>
+        </association>
+    </resultMap>
+
+    <select id="findOrderAndUser" resultMap="orderMap">
+        #表名起成order会报错，需要用引号括起来
+#         select * from order o,user u where o.uid = u.id
+        select * from orders o,user u where o.uid=u.id;
+    </select>
+</mapper>

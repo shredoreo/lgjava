@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.shred.dao.UserDao">
+
+    <!--抽取sql片段-->
+    <sql id="selectUser"> select * from User</sql>
+
+    <!--查询结果为列表时 只需指定泛型类型-->
+    <select id="findAll" resultType="User">
+        <!--引入sql片段-->
+        <include refid="selectUser"></include>
+    </select>
+
+    <insert id="saveUser" parameterType="User">
+        insert into user
+        values (#{id}, #{username})
+    </insert>
+
+    <update id="update" parameterType="User">
+        update user
+        set username = #{username}
+        where id = #{id};
+    </update>
+
+    <!--包装类型预设了别名-->
+    <delete id="delete" parameterType="int">
+        delete
+        from user
+        where id = #{xxx}
+    </delete>
+
+    <!--多条件组合查询-->
+    <select id="findByCondition" parameterType="User" resultType="user">
+        <include refid="selectUser"></include>
+        <where>
+            <if test="id != null">
+                and id = #{id}
+            </if>
+            <if test="username != null">
+                and username = ${username}
+            </if>
+        </where>
+    </select>
+
+    <select id="findByIds" parameterType="list" resultType="user">
+        <include refid="selectUser"></include>
+        <where>
+            <foreach collection="array" open="id in (" close=")" item="id" separator=",">
+                #{id}
+            </foreach>
+        </where>
+    </select>
+
+</mapper>
