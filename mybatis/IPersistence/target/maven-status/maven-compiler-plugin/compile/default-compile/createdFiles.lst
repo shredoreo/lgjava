@@ -1,0 +1,17 @@
+com/shred/utils/TokenHandler.class
+com/shred/utils/ParameterMapping.class
+com/shred/sqlSession/DefaultSqlSessionFactory.class
+com/shred/io/Resources.class
+com/shred/config/XMLConfigBuilder.class
+com/shred/sqlSession/SqlSessionFactory.class
+com/shred/sqlSession/SqlSessionFactoryBuilder.class
+com/shred/sqlSession/Executor.class
+com/shred/sqlSession/DefaultSqlSession.class
+com/shred/config/BoundSql.class
+com/shred/utils/GenericTokenParser.class
+com/shred/sqlSession/SqlSession.class
+com/shred/pojo/MappedStatement.class
+com/shred/sqlSession/SimpleExecutor.class
+com/shred/pojo/Configuration.class
+com/shred/utils/ParameterMappingTokenHandler.class
+com/shred/config/XMLMapperBuilder.class

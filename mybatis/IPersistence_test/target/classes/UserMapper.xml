@@ -1,0 +1,16 @@
+<!--<mapper namespace="user">-->
+<mapper namespace="com.shred.dao.IUserDao">
+
+    <select id="findAll" resultType="com.shred.pojo.User">
+        select * from user
+    </select>
+
+
+    <select id="findByCondition" resultType="com.shred.pojo.User" parameterType="com.shred.pojo.User">
+<!--        select * from user where id = ? and username = ?-->
+                select * from user where id = #{id} and username = #{username}
+    </select>
+
+
+
+</mapper>
