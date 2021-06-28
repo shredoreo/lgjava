@@ -3,14 +3,34 @@
         "http://mybatis.org/dtd/mybatis-3-config.dtd">
 <configuration>
     <properties resource="jdbc.properties"/>
-
+    <!--开启二级缓存-->
+    <settings>
+        <setting name="cacheEnabled" value="true"/>
+    </settings>
     <!--给实体类的全类名起别名-->
     <typeAliases>
         <!--批量给包下的类起别名，且不区分大小写-->
         <package name="com.shred.pojo"/>
         <!--单个类起别名-->
-<!--        <typeAlias type="com.shred.pojo.User" alias="user"/>-->
+        <!--        <typeAlias type="com.shred.pojo.User" alias="user"/>-->
     </typeAliases>
+
+    <plugins>
+        <plugin interceptor="com.shred.plugin.MyPlugin">
+            <property name="name" value="tom"/>
+        </plugin>
+
+        <!--pageHelper-->
+        <plugin interceptor="com.github.pagehelper.PageHelper">
+            <property name="dialect" value="mysql"/>
+        </plugin>
+
+
+        <plugin interceptor="tk.mybatis.mapper.mapperhelper.MapperInterceptor">
+            <!-- 通用Mapper接口，多个通用接口用逗号隔开 -->
+            <property name="mappers" value="tk.mybatis.mapper.common.Mapper"/>
+        </plugin>
+    </plugins>
 
 
     <environments default="development">
@@ -27,8 +47,10 @@
     </environments>
     <mappers>
         <!--引入注解类-->
-<!--        <mapper class="com.shred.mapper.IUserMapper"/>-->
+        <!--        <mapper class="com.shred.mapper.IUserMapper"/>-->
         <!--使用package方式，要求mapper.xml所在的文件目录跟Mapper类的目录一样-->
         <package name="com.shred.mapper"/>
     </mappers>
+
+
 </configuration>

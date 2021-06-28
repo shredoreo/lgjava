@@ -2,9 +2,13 @@ package com.shred.mapper;
 
 import com.shred.pojo.User;
 import org.apache.ibatis.annotations.*;
+import org.apache.ibatis.cache.impl.PerpetualCache;
+import org.mybatis.caches.redis.RedisCache;
 
 import java.util.List;
 
+//开启二级缓存
+//@CacheNamespace(implementation = RedisCache.class)
 public interface IUserMapper {
 
     @Select("select * from user")
@@ -32,6 +36,7 @@ public interface IUserMapper {
     })
     List<User> findAllUserAndRole();
 
+    @Options(useCache = true)
     @Select("select  * from user where id = #{id}")
     User findOne(Integer id);
 
