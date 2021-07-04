@@ -11,6 +11,7 @@ import java.util.List;
 public class DefaultSqlSession implements SqlSession {
 
     private Configuration configuration;
+    private SimpleExecutor simpleExecutor = new SimpleExecutor();;
 
     public DefaultSqlSession(Configuration configuration) {
         this.configuration = configuration;
@@ -21,7 +22,7 @@ public class DefaultSqlSession implements SqlSession {
         MappedStatement mappedStatement = configuration.getMappedStatementMap().get(statementId);
 
         //完成对SimpleExecutor对query
-        SimpleExecutor simpleExecutor = new SimpleExecutor();
+        simpleExecutor = new SimpleExecutor();
         List<Object> query = simpleExecutor.query(configuration, mappedStatement, params);
 
         return (List<E>) query;
@@ -31,12 +32,36 @@ public class DefaultSqlSession implements SqlSession {
     public <T> T selectOne(String statementId, Object... params) throws IllegalAccessException, ClassNotFoundException, IntrospectionException, InstantiationException, SQLException, InvocationTargetException, NoSuchFieldException {
 
         List<Object> objects = selectList(statementId, params);
-        if (objects.size() == 1){
+        if (objects.size() == 0 ){
+          return null;
+        } else if (objects.size() == 1){
             return (T) objects.get(0);
         } else {
             throw new RuntimeException("查询结果为空，或返回结果过多");
         }
 
+    }
+
+    @Override
+    public int insert(String statement, Object... params) throws IllegalAccessException, IntrospectionException, InstantiationException, NoSuchFieldException, SQLException, InvocationTargetException, ClassNotFoundException {
+        MappedStatement mappedStatement = configuration.getMappedStatementMap().get(statement);
+
+        return simpleExecutor.insert(configuration, mappedStatement, params);
+    }
+
+    @Override
+    public int update(String statement, Object... params) throws IllegalAccessException, IntrospectionException, InstantiationException, NoSuchFieldException, SQLException, InvocationTargetException, ClassNotFoundException {
+
+        MappedStatement mappedStatement = configuration.getMappedStatementMap().get(statement);
+
+        return simpleExecutor.update(configuration, mappedStatement, params);
+    }
+
+    @Override
+    public int delete(String statement, Object... params) throws IllegalAccessException, IntrospectionException, InstantiationException, NoSuchFieldException, SQLException, InvocationTargetException, ClassNotFoundException {
+        MappedStatement mappedStatement = configuration.getMappedStatementMap().get(statement);
+
+        return simpleExecutor.delete(configuration, mappedStatement, params);
     }
 
     @Override
@@ -57,12 +82,25 @@ public class DefaultSqlSession implements SqlSession {
                 //获取方法返回值类型
                 Type genericReturnType = method.getGenericReturnType();
 
-                //此处简单地根据返回值是否带泛型判断调用的是selectList还是selectOne
-                if (genericReturnType instanceof ParameterizedType) {
-                    return selectList(statementId, args);
+                MappedStatement ms = configuration.getMappedStatement(statementId);
+                //根据指令类型判断拦截的方法
+                switch (ms.getSqlCommand()){
+                    case SELECT:
+                        //此处简单地根据返回值是否带泛型判断调用的是selectList还是selectOne
+                        if (genericReturnType instanceof ParameterizedType) {
+                            return selectList(statementId, args);
+                        } else {
+                            return selectOne(statementId, args);
+                        }
+                    case UPDATE:
+                        return update(statementId, args);
+                    case DELETE:
+                        return delete(statementId, args);
+                    case INSERT:
+                        return insert(statementId, args);
+                    default:
+                        return null;
                 }
-
-                return selectOne(statementId, args);
             }
         });
 

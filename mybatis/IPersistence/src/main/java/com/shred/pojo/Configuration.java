@@ -37,4 +37,8 @@ public class Configuration {
     public void setMappedStatementMap(Map<String, MappedStatement> mappedStatementMap) {
         this.mappedStatementMap = mappedStatementMap;
     }
+
+    public MappedStatement getMappedStatement(String statementId){
+        return this.mappedStatementMap.get(statementId);
+    }
 }

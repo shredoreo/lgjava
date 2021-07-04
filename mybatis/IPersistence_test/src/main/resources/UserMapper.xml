@@ -5,12 +5,24 @@
         select * from user
     </select>
 
+    <select id="findById" resultType="com.shred.pojo.User" parameterType="com.shred.pojo.User">
+        select * from user where id = #{id}
+    </select>
 
     <select id="findByCondition" resultType="com.shred.pojo.User" parameterType="com.shred.pojo.User">
-<!--        select * from user where id = ? and username = ?-->
                 select * from user where id = #{id} and username = #{username}
     </select>
 
+    <update id="update" parameterType="com.shred.pojo.User">
+        update user set username = #{username} where id = #{id}
+    </update>
 
+    <insert id="insert" parameterType="com.shred.pojo.User">
+        insert into user(id, username) values(#{id}, #{username})
+    </insert>
+
+    <delete id="delete" parameterType="com.shred.pojo.User">
+        delete from user where id = #{id}
+    </delete>
 
 </mapper>

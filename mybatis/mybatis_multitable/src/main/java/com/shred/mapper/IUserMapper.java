@@ -3,6 +3,7 @@ package com.shred.mapper;
 import com.shred.pojo.User;
 import org.apache.ibatis.annotations.*;
 import org.apache.ibatis.cache.impl.PerpetualCache;
+import org.apache.ibatis.mapping.FetchType;
 import org.mybatis.caches.redis.RedisCache;
 
 import java.util.List;
@@ -12,14 +13,15 @@ import java.util.List;
 public interface IUserMapper {
 
     @Select("select * from user")
-    @Results({
+    //给@Results加上id，实现复用，复用时使用@ResultMap(value={"id"})
+    @Results(id = "userOrderMap", value = {
             @Result(property = "id", column = "id"),
             @Result(property = "username", column = "username"),
             @Result(property = "orderList", column = "id",
                     //javaType 为list
                     javaType = List.class,
                     //many 中的selectMapper的参数由column指定，也就是取id那一列的值作为其参数
-                    many = @Many(select = "com.shred.mapper.IOrderMapper.findOrderByUid")
+                    many = @Many(fetchType = FetchType.EAGER, select = "com.shred.mapper.IOrderMapper.findOrderByUid")
             ),
     })
     List<User> findAll();
@@ -38,6 +40,7 @@ public interface IUserMapper {
 
     @Options(useCache = true)
     @Select("select  * from user where id = #{id}")
+    @ResultMap(value = {"userOrderMap"})
     User findOne(Integer id);
 
     @Insert("insert into user values(#{id}, #{username})")

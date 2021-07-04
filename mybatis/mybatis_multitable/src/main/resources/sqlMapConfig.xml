@@ -6,6 +6,8 @@
     <!--开启二级缓存-->
     <settings>
         <setting name="cacheEnabled" value="true"/>
+        <!--开启全局延迟加载功能-->
+        <setting name="lazyLoadingEnabled" value="true"/>
     </settings>
     <!--给实体类的全类名起别名-->
     <typeAliases>

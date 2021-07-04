@@ -1,5 +1,7 @@
 package com.shred.pojo;
 
+import com.shred.enums.SqlCommand;
+
 public class MappedStatement {
 
     /**
@@ -12,6 +14,25 @@ public class MappedStatement {
     private String parameterType;
 
     private String sql;
+
+    private SqlCommand sqlCommand;
+
+
+    public SqlCommand getSqlCommand() {
+        return sqlCommand;
+    }
+
+    public void setSqlCommand(SqlCommand sqlCommand) {
+        this.sqlCommand = sqlCommand;
+    }
+
+    public MappedStatement(String id, String resultType, String parameterType, String sql, SqlCommand sqlCommand) {
+        this.id = id;
+        this.resultType = resultType;
+        this.parameterType = parameterType;
+        this.sql = sql;
+        this.sqlCommand = sqlCommand;
+    }
 
     public MappedStatement(String id, String resultType, String parameterType, String sql) {
         this.id = id;

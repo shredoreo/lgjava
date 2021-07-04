@@ -21,11 +21,11 @@ public class User implements Serializable {
     private Integer id;
 
     private String username;
-   /* private String password;
+    private String password;
     private Date birthDay;
 
     //权限列表
     private List<Role> roleList;
 
-    private List<Order> orderList;*/
+    private List<Order> orderList;
 }
