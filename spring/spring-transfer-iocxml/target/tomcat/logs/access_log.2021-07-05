@@ -1,3 +1,0 @@
-0:0:0:0:0:0:0:1 - - [05/Jul/2021:00:39:47 +0800] "POST /transferServlet HTTP/1.1" 200 72 http-bio-8080-exec-1 809
-0:0:0:0:0:0:0:1 - - [05/Jul/2021:00:57:21 +0800] "POST /transferServlet HTTP/1.1" 200 72 http-bio-8080-exec-1 782
-0:0:0:0:0:0:0:1 - - [05/Jul/2021:00:57:55 +0800] "POST /transferServlet HTTP/1.1" 200 31 http-bio-8080-exec-1 880
