@@ -6,11 +6,13 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
+        <module name="spring-transfer-iocxml" />
         <module name="lagou-transfer" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="lagou-transfer" target="11" />
+      <module name="spring-transfer-iocxml" target="11" />
     </bytecodeTargetLevel>
   </component>
 </project>

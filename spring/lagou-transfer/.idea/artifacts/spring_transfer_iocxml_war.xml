@@ -1,0 +1,14 @@
+<component name="ArtifactManager">
+  <artifact type="war" name="spring-transfer-iocxml:war">
+    <output-path>$PROJECT_DIR$/../spring-transfer-iocxml/target</output-path>
+    <properties id="maven-jee-properties">
+      <options>
+        <module>spring-transfer-iocxml</module>
+        <packaging>war</packaging>
+      </options>
+    </properties>
+    <root id="archive" name="spring-transfer-iocxml-1.0-SNAPSHOT.war">
+      <element id="artifact" artifact-name="spring-transfer-iocxml:war exploded" />
+    </root>
+  </artifact>
+</component>

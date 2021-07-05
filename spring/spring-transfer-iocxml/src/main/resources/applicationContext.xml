@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        https://www.springframework.org/schema/beans/spring-beans.xsd">
+<!--跟标签beans，里面配置一个又一个的bean子标签，每一个bean子标签都代表一个类的配置-->
+    <bean id="accountDao" class="com.shred.spring.dao.impl.JdbcAccountDaoImpl">
+        <property name="ConnectionUtils" ref="connectionUtils"/>
+    </bean>
+
+    <bean id="transferService" class="com.shred.spring.service.impl.TransferServiceImpl">
+        <!--set + name 调用set方法-->
+        <property name="AccountDao" ref="accountDao"/>
+    </bean>
+
+    <bean id="connectionUtils" class="com.shred.spring.utils.ConnectionUtils">
+
+    </bean>
+<!--事务管理-->
+    <bean id="transactionManager" class="com.shred.spring.utils.TransactionManager">
+        <property name="ConnectionUtils" ref="connectionUtils"/>
+    </bean>
+
+    <!--代理工厂-->
+    <bean id="proxyFactory" class="com.shred.spring.factory.ProxyFactory">
+        <property name="TransactionManager" ref="transactionManager"/>
+    </bean>
+
+</beans>

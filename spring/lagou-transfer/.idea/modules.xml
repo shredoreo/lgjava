@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/lagou-transfer.iml" filepath="$PROJECT_DIR$/lagou-transfer.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../spring-transfer-iocxml/spring-transfer-iocxml.iml" filepath="$PROJECT_DIR$/../spring-transfer-iocxml/spring-transfer-iocxml.iml" />
     </modules>
   </component>
 </project>
