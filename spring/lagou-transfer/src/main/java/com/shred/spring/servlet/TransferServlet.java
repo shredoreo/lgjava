@@ -5,6 +5,9 @@ import com.shred.spring.factory.ProxyFactory;
 import com.shred.spring.utils.JsonUtils;
 import com.shred.spring.pojo.Result;
 import com.shred.spring.service.TransferService;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
+
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -26,9 +29,17 @@ public class TransferServlet extends HttpServlet {
     // 从工厂获取委托对象（委托对象是增强了事务控制的功能）
 
     // 首先从BeanFactory获取到proxyFactory代理工厂的实例化对象
-    private ProxyFactory proxyFactory = (ProxyFactory) BeanFactory.getBean("proxyFactory");
-    private TransferService transferService = (TransferService) proxyFactory.getJdkProxy(BeanFactory.getBean("transferService")) ;
+//    private ProxyFactory proxyFactory = (ProxyFactory) BeanFactory.getBean("proxyFactory");
 
+    private TransferService transferService = null;
+
+    @Override
+    public void init() throws ServletException {
+//        WebApplicationContext webApplicationContext = WebApplicationContextUtils.getWebApplicationContext(this.getServletContext());
+
+//        transferService  = (TransferService) webApplicationContext.getBean("transferService");
+//        transferService = (TransferService) webApplicationContext.getBean("transferService");
+    }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -37,6 +48,7 @@ public class TransferServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+
 
         // 设置请求体的字符编码
         req.setCharacterEncoding("UTF-8");
@@ -49,7 +61,7 @@ public class TransferServlet extends HttpServlet {
         Result result = new Result();
 
         try {
-
+            System.out.println("transferService: "+ transferService);
             // 2. 调用service层方法
             transferService.transfer(fromCardNo,toCardNo,money);
             result.setStatus("200");
