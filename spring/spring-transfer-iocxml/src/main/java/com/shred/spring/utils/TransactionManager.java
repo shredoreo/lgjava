@@ -1,9 +1,14 @@
 package com.shred.spring.utils;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import java.sql.SQLException;
 
+//@Component("transactionManager")
 public class TransactionManager {
 
+    @Autowired
     private ConnectionUtils connectionUtils;
 
     public void setConnectionUtils(ConnectionUtils connectionUtils) {

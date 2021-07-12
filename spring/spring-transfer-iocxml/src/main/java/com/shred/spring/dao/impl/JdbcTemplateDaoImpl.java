@@ -1,39 +1,27 @@
 package com.shred.spring.dao.impl;
 
-import com.shred.spring.pojo.Account;
 import com.shred.spring.dao.AccountDao;
+import com.shred.spring.pojo.Account;
 import com.shred.spring.utils.ConnectionUtils;
-import com.shred.spring.utils.DruidUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 
-/**
- * @author 应癫
- */
 @Repository("accountDao")
-public class JdbcAccountDaoImpl implements AccountDao {
+public class JdbcTemplateDaoImpl implements AccountDao {
 
-    //  @Autowired按照类型来注入
     @Autowired
-    private ConnectionUtils connectionUtils;
+    private JdbcTemplate jdbcTemplate;
 
     @Value("zzz")
     private String name;
-
-    /*public JdbcAccountDaoImpl(ConnectionUtils connectionUtils, String name) {
-        this.connectionUtils = connectionUtils;
-        this.name = name;
-    }
-*/
-    public void setConnectionUtils(ConnectionUtils connectionUtils) {
-        this.connectionUtils = connectionUtils;
-    }
 
 
     public void init() {
@@ -46,47 +34,25 @@ public class JdbcAccountDaoImpl implements AccountDao {
 
     @Override
     public Account queryAccountByCardNo(String cardNo) throws Exception {
-        //从连接池获取连接
-//         Connection con = DruidUtils.getInstance().getConnection();
-//        Connection con = connectionUtils.getCurrentThreadConn();
-        Connection con = connectionUtils.getCurrentThreadConn();
+
         String sql = "select * from account where cardNo=?";
-        PreparedStatement preparedStatement = con.prepareStatement(sql);
-        preparedStatement.setString(1,cardNo);
-        ResultSet resultSet = preparedStatement.executeQuery();
 
-        Account account = new Account();
-        while(resultSet.next()) {
-            account.setCardNo(resultSet.getString("cardNo"));
-            account.setName(resultSet.getString("name"));
-            account.setMoney(resultSet.getInt("money"));
-        }
-
-        resultSet.close();
-        preparedStatement.close();
-        //con.close();
-
-        return account;
+        return jdbcTemplate.queryForObject(sql,new Object[]{cardNo}, new RowMapper<Account>() {
+            @Override
+            public Account mapRow(ResultSet resultSet, int i) throws SQLException {
+                Account account = new Account();
+                account.setName(resultSet.getString("name"));
+                account.setCardNo(resultSet.getString("cardNo"));
+                account.setMoney(resultSet.getInt("money"));
+                return account;
+            }
+        });
     }
 
     @Override
     public int updateAccountByCardNo(Account account) throws Exception {
-
-        // 从连接池获取连接
-        // 改造为：从当前线程当中获取绑定的connection连接
-//        Connection con = DruidUtils.getInstance().getConnection();
-//        Connection con = connectionUtils.getCurrentThreadConn();
-        Connection con = connectionUtils.getCurrentThreadConn();
-
         String sql = "update account set money=? where cardNo=?";
-        PreparedStatement preparedStatement = con.prepareStatement(sql);
-        preparedStatement.setInt(1,account.getMoney());
-        preparedStatement.setString(2,account.getCardNo());
-        int i = preparedStatement.executeUpdate();
-
-        preparedStatement.close();
-        //con.close();
-        return i;
+        return jdbcTemplate.update(sql, account.getMoney(), account.getCardNo());
     }
 
     public void setName(String name) {

@@ -4,6 +4,7 @@ import com.shred.spring.factory.ProxyFactory;
 import com.shred.spring.utils.JsonUtils;
 import com.shred.spring.pojo.Result;
 import com.shred.spring.service.TransferService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -28,15 +29,14 @@ public class TransferServlet extends HttpServlet {
 
     // 首先从BeanFactory获取到proxyFactory代理工厂的实例化对象
 //    private ProxyFactory proxyFactory = (ProxyFactory) BeanFactory.getBean("proxyFactory");
+    @Autowired
     private TransferService transferService  ;
 
 
     @Override
     public void init() throws ServletException {
-        //Spring提供的工具方法：在servlet中获取springIoC容器
         WebApplicationContext webApplicationContext = WebApplicationContextUtils.getWebApplicationContext(this.getServletContext());
-        ProxyFactory proxyFactory = (ProxyFactory) webApplicationContext.getBean("proxyFactory");
-         transferService = (TransferService) proxyFactory.getJdkProxy(webApplicationContext.getBean("transferService"));
+        transferService  = (TransferService) webApplicationContext.getBean("transferService");
     }
 
     @Override

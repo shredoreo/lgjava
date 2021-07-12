@@ -4,6 +4,10 @@ import com.shred.spring.pojo.Account;
 import com.shred.spring.dao.AccountDao;
 import com.shred.spring.utils.ConnectionUtils;
 import com.shred.spring.utils.DruidUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -12,10 +16,21 @@ import java.sql.ResultSet;
 /**
  * @author 应癫
  */
+//@Repository("accountDao")
 public class JdbcAccountDaoImpl implements AccountDao {
 
+    //  @Autowired按照类型来注入
+    @Autowired
     private ConnectionUtils connectionUtils;
 
+    @Value("zzz")
+    private String name;
+
+    /*public JdbcAccountDaoImpl(ConnectionUtils connectionUtils, String name) {
+        this.connectionUtils = connectionUtils;
+        this.name = name;
+    }
+*/
     public void setConnectionUtils(ConnectionUtils connectionUtils) {
         this.connectionUtils = connectionUtils;
     }
@@ -72,5 +87,9 @@ public class JdbcAccountDaoImpl implements AccountDao {
         preparedStatement.close();
         //con.close();
         return i;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }

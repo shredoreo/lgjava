@@ -96,6 +96,36 @@
       <artifactId>spring-web</artifactId>
       <version>5.1.12.RELEASE</version>
     </dependency>
+    <dependency>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
+      <version>1.18.20</version>
+      <scope>provided</scope>
+    </dependency>
+
+      <dependency>
+          <groupId>org.springframework</groupId>
+          <artifactId>spring-aop</artifactId>
+          <version>5.1.12.RELEASE</version>
+      </dependency>
+    <!-- https://mvnrepository.com/artifact/org.aspectj/aspectjweaver -->
+    <dependency>
+      <groupId>org.aspectj</groupId>
+      <artifactId>aspectjweaver</artifactId>
+      <version>1.8.13</version>
+    </dependency>
+
+    <!--spring 声明式事务相关依赖-->
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-jdbc</artifactId>
+      <version>5.1.12.RELEASE</version>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-tx</artifactId>
+      <version>5.1.12.RELEASE</version>
+    </dependency>
 
   </dependencies>
 
