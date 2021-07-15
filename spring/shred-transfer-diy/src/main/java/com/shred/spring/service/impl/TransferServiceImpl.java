@@ -1,5 +1,6 @@
 package com.shred.spring.service.impl;
 
+import com.shred.spring.anno.def.Autowired;
 import com.shred.spring.anno.def.Service;
 import com.shred.spring.dao.AccountDao;
 import com.shred.spring.factory.BeanFactory;
@@ -18,6 +19,7 @@ public class TransferServiceImpl implements TransferService {
     // private AccountDao accountDao = (AccountDao) BeanFactory.getBean("accountDao");
 
     // 最佳状态
+    @Autowired
     private AccountDao accountDao;
 
     // 构造函数传值/set方法传值

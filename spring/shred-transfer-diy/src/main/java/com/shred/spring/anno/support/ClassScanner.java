@@ -15,7 +15,14 @@ public class ClassScanner {
      * @return
      */
     public List<Class> doScan(String packageName) throws ClassNotFoundException {
+        //处理不通操作系统 统一路径
         String rootPath = ClassScanner.class.getResource("/").getPath();
+        rootPath = rootPath.replace("/", File.separator)
+                .replace("\\", File.separator);
+        if ("\\".equals(File.separator)){
+            rootPath = rootPath.substring(1);
+        }
+
         String subPath = packageName.replace(".", File.separator);
         String scanPath = rootPath + subPath;
 
@@ -23,8 +30,9 @@ public class ClassScanner {
         ArrayList<Class> classes = new ArrayList<>();
         for (String path : classPaths) {
             //得到类的全限定路径
-//            path = path.replace(rootPath.replace(rootPath,"\\").replaceFirst("\\\\",""),"").replace("\\",".").replace(".class","");
-            path = path.replace(rootPath, "").replace("/", ".").replace(".class", "");
+            path = path.replace(rootPath, "")
+                    .replace(File.separator, ".")
+                    .replace(".class", "");
             try {
 
                 Class<?> aClass = Class.forName(path);

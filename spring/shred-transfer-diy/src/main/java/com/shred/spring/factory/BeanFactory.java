@@ -1,17 +1,18 @@
 package com.shred.spring.factory;
 
+import com.shred.spring.exception.AmbiguousBeanException;
+import com.shred.spring.exception.BeanNoDefException;
+import org.apache.commons.lang.StringUtils;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
+import org.springframework.util.CollectionUtils;
 
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 工厂类，生成bean对象（使用反射技术）
@@ -22,8 +23,18 @@ public class BeanFactory {
      * 1、解析xml，通过反射实例化并保存（存入Map）
      * 2、对外提供获取实例的方法（key：id）
      */
-    private static Map<String,Object> map = new HashMap<>();
-    private static Map<Class<?>,Object> typeMap = new HashMap<>();
+    private static Map<String, Object> map = new HashMap<>();
+    /**
+     * 精确的类型 对应的bean
+     */
+    private static Map<Class<?>, Object> typeMap = new HashMap<>();
+
+    /**
+     * 类型 对应的beanName
+     */
+    private static Map<Class<?>, Set<String>> beanNamesByType = new HashMap<>();
+
+//    private static Set<Class>
 
     static {
         // 1、解析xml，通过反射实例化并保存（存入Map）
@@ -68,7 +79,7 @@ public class BeanFactory {
                 for (int j = 0; j < methods.length; j++) {
                     Method method = methods[j];
                     //找到对应的setter方法
-                    if (method.getName().equalsIgnoreCase("set"+ name)){
+                    if (method.getName().equalsIgnoreCase("set" + name)) {
                         method.invoke(parentObject, map.get(ref));
                     }
                 }
@@ -89,25 +100,105 @@ public class BeanFactory {
 
     }
 
-    public static Object getBean(String id){
-        return map.get(id);
+    public static Object getBean(String id) throws BeanNoDefException {
+        return Optional.ofNullable(
+                map.get(id)
+        ).orElseThrow(
+                () -> new BeanNoDefException("找不到对应的bean" + id)
+        );
     }
 
-    public static <T>T getBeanByClass(Class<T> type){
-        return (T) typeMap.get(type);
+    public static Object getBean(Class<?> type) {
+        return typeMap.get(type);
     }
 
-    public static void putBean(String id, Object bean){
+
+    public static Object getBeanByClass(Class<?> type) {
+        Object t = typeMap.get(type);
+        if (t == null) {
+            Class<?>[] interfaces = type.getInterfaces();
+            for (Class<?> anInterface : interfaces) {
+                Object beanByClass = getBeanByClass(anInterface);
+                if (beanByClass != null) {
+                    return beanByClass;
+                }
+            }
+        }
+
+        return t;
+    }
+
+    public static void putBean(String id, Object bean) {
         map.put(id, bean);
     }
 
-    public static void putBean(Class<?> type, Object bean){
+    public static void putBean(Class<?> type, Object bean) {
         String beanName = type.getName();
         //首字母小写
-        beanName = beanName.substring(0,1).toUpperCase(Locale.ROOT).concat(beanName.substring(1));
+        beanName = beanName.substring(0, 1).toUpperCase(Locale.ROOT).concat(beanName.substring(1));
+
+        Class<?>[] interfaces = type.getInterfaces();
+        //原本的
+        beanNamesByType.computeIfAbsent(type, key -> new HashSet<>()).add(beanName);
+        //实现接口
+        for (Class<?> anInterface : interfaces) {
+            beanNamesByType.computeIfAbsent(anInterface, key -> new HashSet<>()).add(beanName);
+        }
 
         map.put(beanName, bean);
         typeMap.put(type, bean);
+
+    }
+
+    public static Set<String> getBeanNamesByType(Class<?> type) {
+        return beanNamesByType.get(type);
+    }
+
+    /**
+     * 找到类型对应的bean
+     *
+     * @param type
+     * @return
+     * @throws BeanNoDefException
+     * @throws AmbiguousBeanException
+     */
+    public static Object findBeanByType(Class<?> type) throws BeanNoDefException, AmbiguousBeanException {
+        return findBean(null, type);
+    }
+
+    public static boolean checkExist(Class<?> type){
+        return getBeanNamesByType(type) != null;
+    }
+
+    /**
+     * 找到类型对应的bean
+     *
+     * @param beanName
+     * @param type
+     * @return
+     * @throws BeanNoDefException
+     * @throws AmbiguousBeanException
+     */
+    public static Object findBean(String beanName, Class<?> type) throws BeanNoDefException, AmbiguousBeanException {
+        //制定了id，直接获取
+        if (StringUtils.isNotBlank(beanName)) {
+            return getBean(beanName);
+        }
+
+        Set<String> beanNamesByType = getBeanNamesByType(type);
+        // 找不到
+        if (CollectionUtils.isEmpty(beanNamesByType)) {
+            throw new BeanNoDefException("找不到类型对应的bean:" + type.getName());
+        }
+
+        // 找到过多的
+        if (beanNamesByType.size() > 1) {
+            throw new AmbiguousBeanException("存在多个bean " + type.getName());
+        }
+
+        // 匹配到一个，用beanName获取
+        return getBean(beanNamesByType.iterator().next());
+
     }
 
 }

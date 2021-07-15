@@ -4,6 +4,8 @@ import com.shred.spring.anno.def.Autowired;
 import com.shred.spring.anno.def.Component;
 import com.shred.spring.anno.def.Service;
 import com.shred.spring.anno.def.Transactional;
+import com.shred.spring.exception.AmbiguousBeanException;
+import com.shred.spring.exception.BeanNoDefException;
 import com.shred.spring.factory.BeanFactory;
 import org.apache.commons.lang.StringUtils;
 
@@ -12,9 +14,15 @@ import java.lang.reflect.Field;
 import java.util.*;
 
 public class AnnotationScanner {
+    /**
+     * 待扫描的类
+     */
     List<Class> classList;
-    Map<Class,List<Class>> annoListMap;
-//    BeanFactory beanFactory;
+    /**
+     * 注解扫描 key：注解；  val：类集合
+     */
+    Map<Class<?>, List<Class<?>>> annoListMap;
+    private HashSet<Class<?>> beanRegistrySet;
 
     public AnnotationScanner(List<Class> classList) {
         this.classList = classList;
@@ -25,55 +33,91 @@ public class AnnotationScanner {
     }
 
     public void doScan() throws Exception {
+        //扫描带注解的类
         scanClassAnnotations();
 
+        //实例化化Bean
         instanceBean();
 
-        scanFieldAnnotations();
+        //扫描字段注解
+//        scanFieldAnnotations();
 
-        scanMethodAnnotations();
+        //扫描方法注解
+//        scanMethodAnnotations();
     }
 
     /**
      * 初始化扫描的bean，并放入beanFactory内
      */
     private void instanceBean() throws Exception {
-        ArrayList<Class> beans = getAnnotatedBeanClasses();
-        for (Class beanType : beans) {
-            Object o = beanType.newInstance();
-//            String beanName = beanType.getName();
-//            beanName = beanName.substring(0,1).toUpperCase(Locale.ROOT).concat(beanName.substring(1));
+        HashSet<Class<?>> beans = getAnnotatedBeanClasses();
+        this.beanRegistrySet = beans;
 
-//            BeanFactory.putBean(beanName,o);
-            BeanFactory.putBean(beanType, o);
+        for (Class<?> beanType : beans) {
+            //先从容器中获取（因为在autowire过程中会实例化依赖，并直接放入）
+            Object bean = BeanFactory.getBean(beanType);
+            //获取不到再创建。并放入容器
+            if (bean == null) {
+                bean = beanType.newInstance();
+                BeanFactory.putBean(beanType, bean);
+            }
 
-            resolveAutoWired(beanType, o);
+            resolveAutoWired(beanType, bean);
+
+            resolveMethodTransactional(beanType, bean);
 
         }
 
     }
 
     /**
+     * 解析方法上的 Transactional
+     *
+     * @param beanType
+     * @param bean
+     */
+    private void resolveMethodTransactional(Class beanType, Object bean) {
+
+    }
+
+    /**
      * 处理 @Autowired
+     * 未解决循环依赖
+     *
      * @param beanType
      * @param o
      */
-    private void resolveAutoWired(Class beanType, Object o) throws IllegalAccessException {
+    private void resolveAutoWired(Class<?> beanType, Object o) throws IllegalAccessException, BeanNoDefException, InstantiationException, AmbiguousBeanException {
         Field[] declaredFields = beanType.getDeclaredFields();
         for (Field field : declaredFields) {
             Autowired annotation = field.getAnnotation(Autowired.class);
-            if (annotation == null){
+            if (annotation == null) {
                 continue;
             }
             String name = annotation.name();
             //指定名称，获取bean
             Object valOfField;
-            if (StringUtils.isNotBlank(name)){
-                valOfField = BeanFactory.getBean(name);
+            Class<?> fieldType = field.getType();
+
+            if (BeanFactory.checkExist(fieldType)) {
+
+                if (StringUtils.isNotBlank(name)) {
+                    valOfField = BeanFactory.getBean(name);
+                } else {
+                    valOfField = BeanFactory.findBeanByType(fieldType);
+                }
+
             } else {
-                Class<?> fieldType = field.getType();
-                valOfField = BeanFactory.getBeanByClass(fieldType);
+                throw new BeanNoDefException("beanDefNotFound:" + fieldType.getName());
             }
+
+            //未初始化，立即初始化，并放入容器
+            if (valOfField == null) {
+                valOfField = fieldType.newInstance();
+                BeanFactory.putBean(fieldType, valOfField);
+            }
+
+            field.setAccessible(true);
             field.set(o, valOfField);
         }
     }
@@ -87,37 +131,36 @@ public class AnnotationScanner {
      * 扫描方法注解
      */
     private void scanMethodAnnotations() {
-        ArrayList<Class> beans = getAnnotatedBeanClasses();
+        HashSet<Class<?>> beans = getAnnotatedBeanClasses();
 
         scanSpecificFieldAnno(Autowired.class, beans);
 
-
     }
 
-    private ArrayList<Class> getAnnotatedBeanClasses() {
-        List<Class> compoents = this.annoListMap.get(Component.class);
+    private HashSet<Class<?>> getAnnotatedBeanClasses() {
+        List<Class<?>> compoents = this.annoListMap.get(Component.class);
 
-        List<Class> services = this.annoListMap.get(Service.class);
+        List<Class<?>> services = this.annoListMap.get(Service.class);
 
-        ArrayList<Class> beans = new ArrayList<>();
-        if (compoents!=null){
+        HashSet<Class<?>> beans = new HashSet<>();
+        if (compoents != null) {
             beans.addAll(compoents);
         }
-        if (services!=null){
+        if (services != null) {
             beans.addAll(services);
         }
         return beans;
     }
 
-    private void scanSpecificFieldAnno(Class<Autowired> autowiredClass, ArrayList<Class> beans) {
+    private void scanSpecificFieldAnno(Class<Autowired> autowiredClass, HashSet<Class<?>> beans) {
         for (Class bean : beans) {
             Field[] declaredFields = bean.getDeclaredFields();
             for (Field declaredField : declaredFields) {
                 Autowired annotation = declaredField.getAnnotation(autowiredClass);
-                if (annotation!=null){
+                if (annotation != null) {
                     String name = annotation.name();
 
-                    if (StringUtils.isNotBlank(name)){
+                    if (StringUtils.isNotBlank(name)) {
 
                     }
                 }
@@ -128,7 +171,7 @@ public class AnnotationScanner {
     /**
      * 扫描类上注解
      */
-    public void scanClassAnnotations(){
+    public void scanClassAnnotations() {
         //用在类上到注解
         scanSpecificAnno(Component.class);
         scanSpecificAnno(Service.class);
@@ -139,7 +182,7 @@ public class AnnotationScanner {
     private void scanSpecificAnno(Class<?> componentClass) {
         for (Class aClass : classList) {
             Annotation annotation = aClass.getAnnotation(componentClass);
-            if (annotation == null){
+            if (annotation == null) {
                 continue;
             }
             //保存到Map中

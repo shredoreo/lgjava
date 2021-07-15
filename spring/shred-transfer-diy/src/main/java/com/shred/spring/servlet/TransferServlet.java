@@ -16,10 +16,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-/**
- * @author 应癫
- */
-@WebServlet(name="transferServlet",urlPatterns = "/transferServlet")
+
+//@WebServlet(name="transferServlet",urlPatterns = "/transferServlet")
 public class TransferServlet extends HttpServlet {
 
     // 1. 实例化service层对象
