@@ -34,6 +34,11 @@ public class BeanFactory {
      */
     private static Map<Class<?>, Set<String>> beanNamesByType = new HashMap<>();
 
+    /**
+     * 扫描到的的beanType
+     */
+    private static Set<String> registeredBeanTypes = new HashSet<>();
+
 //    private static Set<Class>
 
     static {
@@ -108,8 +113,8 @@ public class BeanFactory {
         );
     }
 
-    public static Object getBean(Class<?> type) {
-        return typeMap.get(type);
+    public static <T> T getBean(Class<T> type) {
+        return (T) typeMap.get(type);
     }
 
 
@@ -135,14 +140,17 @@ public class BeanFactory {
     public static void putBean(Class<?> type, Object bean) {
         String beanName = type.getName();
         //首字母小写
-        beanName = beanName.substring(0, 1).toUpperCase(Locale.ROOT).concat(beanName.substring(1));
+        beanName = beanName.substring(0, 1).toLowerCase(Locale.ROOT).concat(beanName.substring(1));
 
+        //原本的类型
         Class<?>[] interfaces = type.getInterfaces();
-        //原本的
-        beanNamesByType.computeIfAbsent(type, key -> new HashSet<>()).add(beanName);
+        beanNamesByType.computeIfAbsent(type, key -> new HashSet<>())
+                .add(beanName);
+
         //实现接口
         for (Class<?> anInterface : interfaces) {
-            beanNamesByType.computeIfAbsent(anInterface, key -> new HashSet<>()).add(beanName);
+            beanNamesByType.computeIfAbsent(anInterface, key -> new HashSet<>())
+                    .add(beanName);
         }
 
         map.put(beanName, bean);
@@ -166,7 +174,7 @@ public class BeanFactory {
         return findBean(null, type);
     }
 
-    public static boolean checkExist(Class<?> type){
+    public static boolean checkExist(Class<?> type) {
         return getBeanNamesByType(type) != null;
     }
 
@@ -199,6 +207,11 @@ public class BeanFactory {
         // 匹配到一个，用beanName获取
         return getBean(beanNamesByType.iterator().next());
 
+    }
+
+
+    public void registerType(Class<?>type){
+        registeredBeanTypes
     }
 
 }

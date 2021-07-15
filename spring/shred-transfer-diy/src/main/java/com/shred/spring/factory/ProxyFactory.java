@@ -1,5 +1,6 @@
 package com.shred.spring.factory;
 
+import com.shred.spring.anno.def.Component;
 import com.shred.spring.utils.TransactionManager;
 import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.MethodInterceptor;
@@ -8,6 +9,7 @@ import net.sf.cglib.proxy.MethodProxy;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 
+@Component
 public class ProxyFactory {
     private TransactionManager transactionManager;
 
@@ -44,7 +46,6 @@ public class ProxyFactory {
                     return result;
                 }
         );
-
     }
 
     public Object getCglibProxy(Object obj) {
