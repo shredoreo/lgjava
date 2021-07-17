@@ -14,7 +14,7 @@ public class ClassScanner {
      * @param packageName
      * @return
      */
-    public List<Class> doScan(String packageName) throws ClassNotFoundException {
+    public List<Class<?>> doScan(String packageName) throws ClassNotFoundException {
         //处理不通操作系统 统一路径
         String rootPath = ClassScanner.class.getResource("/").getPath();
         rootPath = rootPath.replace("/", File.separator)
@@ -27,7 +27,7 @@ public class ClassScanner {
         String scanPath = rootPath + subPath;
 
         scanClass(new File(scanPath));
-        ArrayList<Class> classes = new ArrayList<>();
+        ArrayList<Class<?>> classes = new ArrayList<>();
         for (String path : classPaths) {
             //得到类的全限定路径
             path = path.replace(rootPath, "")
@@ -65,10 +65,12 @@ public class ClassScanner {
     }
 
     public static void main(String[] args) throws ClassNotFoundException {
+        /*
         Class<?> aClass = Class.forName("com.shred.spring.dao.AccountDao");
         System.out.println(aClass);
-        List<Class> classes = new ClassScanner().doScan("com.shred.spring");
+        List<Class<?>> classes = new ClassScanner().doScan("com.shred.spring");
         System.out.println(classes);
+        */
     }
 
 

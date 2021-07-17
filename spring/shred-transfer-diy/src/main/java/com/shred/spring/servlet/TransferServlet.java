@@ -1,12 +1,10 @@
 package com.shred.spring.servlet;
 
+import com.shred.spring.exception.BeanNoDefException;
 import com.shred.spring.factory.BeanFactory;
-import com.shred.spring.factory.ProxyFactory;
 import com.shred.spring.utils.JsonUtils;
 import com.shred.spring.pojo.Result;
 import com.shred.spring.service.TransferService;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
 
 
 import javax.servlet.ServletException;
@@ -17,7 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 
-//@WebServlet(name="transferServlet",urlPatterns = "/transferServlet")
+@WebServlet(name="transferServlet",urlPatterns = "/transferServlet")
 public class TransferServlet extends HttpServlet {
 
     // 1. 实例化service层对象
@@ -33,6 +31,15 @@ public class TransferServlet extends HttpServlet {
 
     @Override
     public void init() throws ServletException {
+        try {
+            //加载BeanFactory 执行静态代码
+            BeanFactory.printSingletonObjects();
+            System.out.println("\n");
+            System.out.println("获取service");
+            transferService = (TransferService) BeanFactory.getBean("AAAtransferServiceAAA");
+        } catch (BeanNoDefException e) {
+            e.printStackTrace();
+        }
 //        WebApplicationContext webApplicationContext = WebApplicationContextUtils.getWebApplicationContext(this.getServletContext());
 
 //        transferService  = (TransferService) webApplicationContext.getBean("transferService");

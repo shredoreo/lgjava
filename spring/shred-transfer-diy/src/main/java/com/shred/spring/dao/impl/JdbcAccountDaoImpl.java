@@ -1,5 +1,6 @@
 package com.shred.spring.dao.impl;
 
+import com.shred.spring.anno.def.Autowired;
 import com.shred.spring.anno.def.Component;
 import com.shred.spring.pojo.Account;
 import com.shred.spring.dao.AccountDao;
@@ -10,12 +11,11 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
-/**
- * @author 应癫
- */
+
 @Component
 public class JdbcAccountDaoImpl implements AccountDao {
 
+    @Autowired(name = "dddddConnectionUtils")
     private ConnectionUtils connectionUtils;
 
     public void setConnectionUtils(ConnectionUtils connectionUtils) {

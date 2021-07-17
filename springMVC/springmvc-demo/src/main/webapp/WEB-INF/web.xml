@@ -1,0 +1,67 @@
+<!DOCTYPE web-app PUBLIC
+ "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
+ "http://java.sun.com/dtd/web-app_2_3.dtd" >
+
+<web-app>
+  <display-name>Archetype Created Web Application</display-name>
+
+
+  <!--springMVC提供的 针对post请求的 编码过滤器 -->
+  <filter>
+    <filter-name>encoding</filter-name>
+    <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+    <init-param>
+      <param-name>encoding</param-name>
+      <param-value>UTF-8</param-value>
+    </init-param>
+  </filter>
+
+  <filter-mapping>
+    <filter-name>encoding</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+
+  <!--配置springmvc请求方式转换过滤器，会检查请求参数中是否有_method参数，如果有就 按照指定的请求方式进行转换-->
+  <filter>
+    <filter-name>hiddenHttpMethodFilter</filter-name>
+    <filter-class>org.springframework.web.filter.HiddenHttpMethodFilter</filter-class>
+  </filter>
+
+  <filter-mapping>
+    <filter-name>hiddenHttpMethodFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+
+  <servlet>
+    <servlet-name>springmvc</servlet-name>
+    <!--spring mvc 前端控制的-->
+    <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+
+    <!--指定配置文件的路径-->
+    <init-param>
+      <param-name>contextConfigLocation</param-name>
+      <param-value>classpath:springmvc.xml</param-value>
+    </init-param>
+
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>springmvc</servlet-name>
+    <!--
+    方式一：带后缀 *.action *.do
+    方式二：/ 不会拦截jsp，但是会拦截.html等静态资源
+
+        为何会拦截静态资源？》
+          因为Tomcat中又一个web.xml 应用的也有web.xml（子），是一个继承关系
+            父web.xml又一个DefaultServlet，url-pattern 是一个/
+            此时我们的项目也配置了/ 覆盖了父级的
+        为何不拦截.jsp?
+          因为父web.xml中又一个jspServlet，拦截jsp文件
+          而子web.xml并没复写，不拦截，交给了父webxml处理
+
+        解决方案：
+
+    方式三：/*拦截所有，包括jsp
+    -->
+    <url-pattern>/</url-pattern>
+  </servlet-mapping>
+</web-app>

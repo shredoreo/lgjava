@@ -19,7 +19,7 @@
     </bean>
 
     &lt;!&ndash;代理工厂&ndash;&gt;
-    <bean id="proxyFactory" class="com.shred.spring.factory.ProxyFactory">
+    <bean id="transactionProxyFactory" class="com.shred.spring.factory.TransactionProxyFactory">
         <property name="TransactionManager" ref="transactionManager"/>
     </bean>-->
 

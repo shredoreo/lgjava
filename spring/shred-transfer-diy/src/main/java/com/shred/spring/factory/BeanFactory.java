@@ -1,5 +1,6 @@
 package com.shred.spring.factory;
 
+import com.shred.spring.anno.support.AnnotationSupport;
 import com.shred.spring.exception.AmbiguousBeanException;
 import com.shred.spring.exception.BeanNoDefException;
 import org.apache.commons.lang.StringUtils;
@@ -37,10 +38,20 @@ public class BeanFactory {
     /**
      * 扫描到的的beanType
      */
-    private static Set<String> registeredBeanTypes = new HashSet<>();
+    private static Set<Class<?>> registeredBeanTypes = new HashSet<Class<?>>();
 
-//    private static Set<Class>
 
+
+    static {
+        try {
+            //注解支持
+            new AnnotationSupport().support("com.shred.spring");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /*
     static {
         // 1、解析xml，通过反射实例化并保存（存入Map）
         InputStream resourceAsStream = BeanFactory.class.getClassLoader().getResourceAsStream("beans.xml");
@@ -104,43 +115,47 @@ public class BeanFactory {
         }
 
     }
+*/
 
     public static Object getBean(String id) throws BeanNoDefException {
         return Optional.ofNullable(
                 map.get(id)
         ).orElseThrow(
-                () -> new BeanNoDefException("找不到对应的bean" + id)
+                () -> new BeanNoDefException("找不到对应的bean：" + id)
         );
     }
 
-    public static <T> T getBean(Class<T> type) {
-        return (T) typeMap.get(type);
+    /**
+     * 精确类型查找
+     *
+     * @param type
+     * @return
+     */
+    public static Object getBean(Class<?> type) {
+        return typeMap.get(type);
     }
 
+    /**
+     * beanId ->bean
+     * 以及 beanType ->bean
+     * 以及 type -> [beanNames]集合
+     * @param type
+     * @param beanId
+     * @param bean
+     */
+    public static void putBean(Class<?> type, String beanId, Object bean) {
 
-    public static Object getBeanByClass(Class<?> type) {
-        Object t = typeMap.get(type);
-        if (t == null) {
-            Class<?>[] interfaces = type.getInterfaces();
-            for (Class<?> anInterface : interfaces) {
-                Object beanByClass = getBeanByClass(anInterface);
-                if (beanByClass != null) {
-                    return beanByClass;
-                }
-            }
+        String beanName = beanId;
+
+        if (StringUtils.isBlank(beanId)) {
+
+            beanName = type.getName();
+            int lastIndexOf = beanName.lastIndexOf('.');
+            String className = beanName.substring(lastIndexOf + 1);
+
+            //首字母小写
+            beanName = className.substring(0, 1).toLowerCase(Locale.ROOT).concat(className.substring(1));
         }
-
-        return t;
-    }
-
-    public static void putBean(String id, Object bean) {
-        map.put(id, bean);
-    }
-
-    public static void putBean(Class<?> type, Object bean) {
-        String beanName = type.getName();
-        //首字母小写
-        beanName = beanName.substring(0, 1).toLowerCase(Locale.ROOT).concat(beanName.substring(1));
 
         //原本的类型
         Class<?>[] interfaces = type.getInterfaces();
@@ -174,8 +189,14 @@ public class BeanFactory {
         return findBean(null, type);
     }
 
+    /**
+     * 检查当前类型是否存在
+     *
+     * @param type
+     * @return
+     */
     public static boolean checkExist(Class<?> type) {
-        return getBeanNamesByType(type) != null;
+        return registeredBeanTypes.contains(type);
     }
 
     /**
@@ -196,7 +217,7 @@ public class BeanFactory {
         Set<String> beanNamesByType = getBeanNamesByType(type);
         // 找不到
         if (CollectionUtils.isEmpty(beanNamesByType)) {
-            throw new BeanNoDefException("找不到类型对应的bean:" + type.getName());
+            return null;
         }
 
         // 找到过多的
@@ -210,8 +231,23 @@ public class BeanFactory {
     }
 
 
-    public void registerType(Class<?>type){
-        registeredBeanTypes
+    /**
+     * 注册存在的bean类型(以及接口类型)
+     *
+     * @param type
+     */
+    public static void registerType(Class<?> type) {
+        //实现接口
+        Class<?>[] interfaces = type.getInterfaces();
+        //注册
+        registeredBeanTypes.addAll(Arrays.asList(interfaces));
+
+        registeredBeanTypes.add(type);
+
+    }
+
+    public static void printSingletonObjects(){
+        map.forEach((key, value) -> System.out.println(key + ": " + value));
     }
 
 }

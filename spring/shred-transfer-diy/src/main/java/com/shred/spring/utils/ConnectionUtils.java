@@ -1,6 +1,7 @@
 package com.shred.spring.utils;
 
 import com.alibaba.druid.pool.DruidPooledConnection;
+import com.shred.spring.anno.def.Component;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -8,6 +9,7 @@ import java.sql.SQLException;
 /**
  * 确保一个线程使用一个connection
  */
+@Component(name = "dddddConnectionUtils")
 public class ConnectionUtils {
 
  /*   private ConnectionUtils(){

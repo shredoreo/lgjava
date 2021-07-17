@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        https://www.springframework.org/schema/beans/spring-beans.xsd
+      http://www.springframework.org/schema/context
+        https://www.springframework.org/schema/context/spring-context.xsd
+           http://www.springframework.org/schema/mvc
+        https://www.springframework.org/schema/mvc/spring-mvc.xsd
+       "
+>
+    <!--开启controller扫描-->
+    <context:component-scan base-package="com.shred.springmvc"/>
+
+    <!--配置mvc视图解析器-->
+    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="prefix" value="/WEB-INF/jsp/"/>
+        <property name="suffix" value=".jsp"/>
+    </bean>
+
+    <!--
+        处理器映射器，处理器适配器
+            - 可以手动配置，注入指定的bean
+            - 也可以开启mvc的注解，通过注解自动注册最合适的处理器bean
+    -->
+    <mvc:annotation-driven conversion-service="conversionServiceBean"/>
+
+    <!--自定义类型转换器， 并关联到mvc配置中-->
+    <bean id="conversionServiceBean" class="org.springframework.format.support.FormattingConversionServiceFactoryBean">
+        <property name="converters">
+            <set>
+                <bean class="com.shred.springmvc.converter.DateConverter"/>
+            </set>
+        </property>
+    </bean>
+    <!--静态资源配置 方案一-->
+    <!--
+    会自动注册一个DefaultServletHttpRequestHandler对象，
+    该对象会对进入 DispatcherServlet的url请求进行筛查，
+           - 若发现是一个静态资源请求，就将请求交给web服务器tomcat默认的DefaultServlet来处理。
+           - 如果不是静态资源请求，就继续由springmvc处理。
+    这种方式会存在问题，静态资源只能放在webapp目录下，且不能放在WEB-INF文件夹下
+    -->
+    <mvc:default-servlet-handler/>
+
+    <!--静态资源配置 方案二：让springMvc自己处理静态资源-->
+    <!--以mapping的值开头的请求，去location指定目录下找，使用逗号分隔多个路径-->
+    <mvc:resources mapping="/resources/**" location="classpath:/,/"/>
+    <mvc:resources mapping="/js/**" location="WEB-INF/js/"/>
+
+    <mvc:interceptors>
+        <!--拦截所有handler-->
+<!--        <bean class="com.shred.springmvc.interceptor.MyInterceptor1"/>-->
+
+        <mvc:interceptor>
+            <!-- ** 代表当前目录及其子目录下的所有url-->
+            <mvc:mapping path="/**"/>
+            <!--排除-->
+<!--            <mvc:exclude-mapping path="/demo/**"/>-->
+            <bean class="com.shred.springmvc.interceptor.MyInterceptor1"/>
+        </mvc:interceptor>
+
+        <mvc:interceptor>
+            <mvc:mapping path="/**"/>
+            <bean class="com.shred.springmvc.interceptor.MyInterceptor2"/>
+        </mvc:interceptor>
+    </mvc:interceptors>
+
+    <!--Multipart 解析器-->
+    <!--固定id：multipartResolver-->
+    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <!--设置上传文件大小-->
+        <property name="maxUploadSize" value="5000000"/>
+    </bean>
+
+
+</beans>
