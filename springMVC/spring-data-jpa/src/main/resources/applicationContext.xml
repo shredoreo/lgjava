@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:jpa="http://www.springframework.org/schema/data/jpa"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+http://www.springframework.org/schema/beans
+https://www.springframework.org/schema/beans/spring-beans.xsd
+http://www.springframework.org/schema/context
+https://www.springframework.org/schema/context/spring-context.xsd
+http://www.springframework.org/schema/data/jpa
+https://www.springframework.org/schema/data/jpa/spring-jpa.xsd
+">
+    <!--1 创建数据库连接池 druid-->
+    <!--引入外部资源文件-->
+    <context:property-placeholder
+            location="classpath:jdbc.properties"/>
+    <bean id="dataSource"
+          class="com.alibaba.druid.pool.DruidDataSource">
+        <property name="driverClassName" value="${jdbc.driver}"/>
+        <property name="url" value="${jdbc.url}"/>
+        <property name="username" value="${jdbc.username}"/>
+        <property name="password" value="${jdbc.password}"/>
+    </bean>
+
+    <!--2 配置JPA非常重要的对象，entityManagerFactory
+        类似于Mybatis中的SqlSessionFactory
+    -->
+    <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+        <property name="dataSource" ref="dataSource"/>
+        <!--扫描包路径：实体类所在的包-->
+        <property name="packagesToScan" value="com.shred.springdata.pojo"/>
+        <!--指定具体实现-->
+        <property name="persistenceProvider">
+            <bean class="org.hibernate.jpa.HibernatePersistenceProvider"/>
+        </property>
+        <!--jpa 方言-->
+        <property name="jpaDialect">
+            <bean class="org.springframework.orm.jpa.vendor.HibernateJpaDialect"/>
+        </property>
+        <!--配置provider， hibernate框架执行细节-->
+        <property name="jpaVendorAdapter">
+            <bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
+                <!--自动创建数据表-->
+                <property name="generateDdl" value="false"/>
+                <!--数据库类型-->
+                <property name="database" value="MYSQL"/>
+                <!--配置方言-->
+                <property name="databasePlatform">
+                    <bean class="org.hibernate.dialect.MySQLDialect"/>
+                </property>
+                <!--打印sql-->
+                <property name="showSql" value="true"/>
+            </bean>
+        </property>
+    </bean>
+
+
+    <!--3 引用entityManagerFactory-->
+    <jpa:repositories base-package="com.shred.springdata.dao" entity-manager-factory-ref="entityManagerFactory"
+                      transaction-manager-ref="transactionManager"/>
+
+    <!--4 配置事务管理器
+        jdbcTemplate/mybatis 使用DateSourceTransactionManager
+        jpa 使用JpaTransactionManager
+    -->
+    <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+        <property name="entityManagerFactory" ref="entityManagerFactory"/>
+    </bean>
+
+
+    <!--5 声明式事务配置-->
+
+
+    <context:component-scan base-package="com.shred.springdata"/>
+
+
+</beans>
