@@ -1,9 +1,6 @@
 package com.shred.framework.mvc.servlet;
 
-import com.shred.framework.mvc.annotations.ShredAutowired;
-import com.shred.framework.mvc.annotations.ShredController;
-import com.shred.framework.mvc.annotations.ShredRequestMapping;
-import com.shred.framework.mvc.annotations.ShredService;
+import com.shred.framework.mvc.annotations.*;
 import com.shred.framework.mvc.pojo.Handler;
 import org.apache.commons.lang3.StringUtils;
 
@@ -19,10 +16,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -101,6 +95,16 @@ public class ShredDispatcherServlet extends HttpServlet {
                 baseUrl = aClass.getAnnotation(ShredRequestMapping.class).value();
             }
 
+            // 获取类上的Security，获取 用户列表
+            ArrayList<String> accessUsers = new ArrayList<>();
+            boolean classEnableSecurity = false;
+            if (aClass.isAnnotationPresent(Security.class)){
+                // 标记类开启权限
+                classEnableSecurity = true;
+                String[] value = aClass.getAnnotation(Security.class).value();
+                accessUsers.addAll(Arrays.asList(value));
+            }
+
             Method[] methods = aClass.getMethods();
             for (Method method : methods) {
                 if (!method.isAnnotationPresent(ShredRequestMapping.class)) {
@@ -112,11 +116,24 @@ public class ShredDispatcherServlet extends HttpServlet {
 
                 String url = baseUrl + methodURL;
 
+                // 获取方法上的Security，获取 用户列表，并合并类上的
+                ArrayList<String> accUsers = new ArrayList<>(accessUsers);
+                boolean methodEnableSecurity = false;
+                if (method.isAnnotationPresent(Security.class)){
+                    // 标记方法开启权限
+                    methodEnableSecurity = true;
+                    String[] value = method.getAnnotation(Security.class).value();
+                    accUsers.addAll(Arrays.asList(value));
+                }
+
                 Handler handler = new Handler(
                         entry.getValue(),
                         method,
                         Pattern.compile(url)
                 );
+                //类或方法开启权限时，设置权限
+                handler.setEnableSecurity(classEnableSecurity || methodEnableSecurity);
+                handler.setAccessUsers(accUsers);
 
                 Parameter[] allParameters = method.getParameters();
                 for (int i = 0; i < allParameters.length; i++) {
@@ -249,6 +266,8 @@ public class ShredDispatcherServlet extends HttpServlet {
         doPost(req, resp);
     }
 
+    private static final String SECURITY_PARAM_KEY = "username";
+
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         //处理请求
@@ -261,7 +280,8 @@ public class ShredDispatcherServlet extends HttpServlet {
 
         //参数绑定
         // 获取所有参数类型的数组
-        Class<?>[] parameterTypes = handler.getMethod().getParameterTypes();
+        Method handlerMethod = handler.getMethod();
+        Class<?>[] parameterTypes = handlerMethod.getParameterTypes();
         //根据数组长度创建一个新的数组，参数数组
         Object[] paraValues = new Object[parameterTypes.length];
 
@@ -270,6 +290,29 @@ public class ShredDispatcherServlet extends HttpServlet {
         Map<String, Integer> handlerParamIndexMapping = handler.getParamIndexMapping();
         // 获取req参数
         Map<String, String[]> parameterMap = req.getParameterMap();
+
+        resp.setContentType("text/html;charset=utf-8");
+        // 判断请求参数中是否存在 username，且username是否有权限
+        if (handler.isEnableSecurity()){
+            // 特权用户
+            List<String> accessUsers = handler.getAccessUsers();
+
+            //无username参数
+            if (!parameterMap.containsKey(SECURITY_PARAM_KEY)
+                    //或者当前username无权限
+                    ||Arrays.stream(parameterMap.get(SECURITY_PARAM_KEY)).noneMatch(accessUsers::contains)
+            ){
+                resp.getWriter().write("no access 无权限");
+                return;
+            }
+            resp.getWriter().write(req.getRequestURI() + "权限校验通过 : " + accessUsers);
+
+        }else {
+
+            resp.getWriter().write("放行。。。无需鉴权");
+        }
+
+
         parameterMap.forEach((k,v) ->{
             // 处理参数 如 name=1&name=2
             String val = StringUtils.join(v, ",");//name = 1,2
@@ -288,7 +331,7 @@ public class ShredDispatcherServlet extends HttpServlet {
 
         try {
             //执行handler方法
-            handler.getMethod().invoke(handler.getController(), paraValues);
+            handlerMethod.invoke(handler.getController(), paraValues);
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         } catch (InvocationTargetException e) {
