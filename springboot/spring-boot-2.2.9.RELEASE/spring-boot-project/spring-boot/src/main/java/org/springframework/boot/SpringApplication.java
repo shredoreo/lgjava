@@ -329,7 +329,9 @@ public class SpringApplication {
 					new Class[] { ConfigurableApplicationContext.class }, context);
 			// 【4】刷新应用上下文的准备工作
 			prepareContext(context, environment, listeners, applicationArguments, printedBanner);
+			// 【5】刷新上下文
 			refreshContext(context);
+
 			afterRefresh(context, applicationArguments);
 			stopWatch.stop();
 			if (this.logStartupInfo) {
