@@ -71,10 +71,12 @@ abstract class DataSourceConfiguration {
 
 	/**
 	 * Hikari DataSource configuration.
+	 * sb2.0之后 默认的连接池
 	 */
 	@Configuration(proxyBeanMethods = false)
 	@ConditionalOnClass(HikariDataSource.class)
-	@ConditionalOnMissingBean(DataSource.class)
+	@ConditionalOnMissingBean(DataSource.class)//尚未注入数据源
+	//比对配置项跟havingValue各自的值是否相同，相同返回true
 	@ConditionalOnProperty(name = "spring.datasource.type", havingValue = "com.zaxxer.hikari.HikariDataSource",
 			matchIfMissing = true)
 	static class Hikari {
@@ -82,6 +84,7 @@ abstract class DataSourceConfiguration {
 		@Bean
 		@ConfigurationProperties(prefix = "spring.datasource.hikari")
 		HikariDataSource dataSource(DataSourceProperties properties) {
+			// 调用外部的createDataSource
 			HikariDataSource dataSource = createDataSource(properties, HikariDataSource.class);
 			if (StringUtils.hasText(properties.getName())) {
 				dataSource.setPoolName(properties.getName());
@@ -111,6 +114,7 @@ abstract class DataSourceConfiguration {
 
 	/**
 	 * Generic DataSource configuration.
+	 * 自定义连接池
 	 */
 	@Configuration(proxyBeanMethods = false)
 	@ConditionalOnMissingBean(DataSource.class)

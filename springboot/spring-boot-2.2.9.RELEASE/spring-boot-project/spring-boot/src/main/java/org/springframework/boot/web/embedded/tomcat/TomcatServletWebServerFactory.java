@@ -174,7 +174,9 @@ public class TomcatServletWebServerFactory extends AbstractServletWebServerFacto
 		if (this.disableMBeanRegistry) {
 			Registry.disableRegistry();
 		}
+		// 创建tomcat
 		Tomcat tomcat = new Tomcat();
+		// 设置tomcat相关属性
 		File baseDir = (this.baseDirectory != null) ? this.baseDirectory : createTempDir("tomcat");
 		tomcat.setBaseDir(baseDir.getAbsolutePath());
 		Connector connector = new Connector(this.protocol);
@@ -182,12 +184,15 @@ public class TomcatServletWebServerFactory extends AbstractServletWebServerFacto
 		tomcat.getService().addConnector(connector);
 		customizeConnector(connector);
 		tomcat.setConnector(connector);
+		// 关闭热部署
 		tomcat.getHost().setAutoDeploy(false);
+		// 配置Engine
 		configureEngine(tomcat.getEngine());
 		for (Connector additionalConnector : this.additionalTomcatConnectors) {
 			tomcat.getService().addConnector(additionalConnector);
 		}
 		prepareContext(tomcat.getHost(), initializers);
+		// 实例化TomcatWebServer时，会将DispatchServlet以及一些filter添加的Tomcat中
 		return getTomcatWebServer(tomcat);
 	}
 

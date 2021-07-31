@@ -150,6 +150,7 @@ public class ServletWebServerApplicationContext extends GenericWebApplicationCon
 	protected void onRefresh() {
 		super.onRefresh();
 		try {
+			// 获取嵌入式的Servlet容器工厂，并根据工厂获取servlet容器
 			createWebServer();
 		}
 		catch (Throwable ex) {
@@ -160,6 +161,7 @@ public class ServletWebServerApplicationContext extends GenericWebApplicationCon
 	@Override
 	protected void finishRefresh() {
 		super.finishRefresh();
+		// 启动在Tomcat启动时就要完成启动的Servlet，检查Connector是否都启动完成。打印最终启动完成的日志
 		WebServer webServer = startWebServer();
 		if (webServer != null) {
 			publishEvent(new ServletWebServerInitializedEvent(webServer, this));
@@ -176,6 +178,7 @@ public class ServletWebServerApplicationContext extends GenericWebApplicationCon
 		WebServer webServer = this.webServer;
 		ServletContext servletContext = getServletContext();
 		if (webServer == null && servletContext == null) {
+			// 获取嵌入式Servlet容器工厂
 			ServletWebServerFactory factory = getWebServerFactory();
 			this.webServer = factory.getWebServer(getSelfInitializer());
 		}
@@ -207,6 +210,7 @@ public class ServletWebServerApplicationContext extends GenericWebApplicationCon
 			throw new ApplicationContextException("Unable to start ServletWebServerApplicationContext due to multiple "
 					+ "ServletWebServerFactory beans : " + StringUtils.arrayToCommaDelimitedString(beanNames));
 		}
+		// 若引入Tomcat相关依赖，此处返回的实例是 TomcatServletWebServerFactory 的实例
 		return getBeanFactory().getBean(beanNames[0], ServletWebServerFactory.class);
 	}
 
@@ -293,6 +297,7 @@ public class ServletWebServerApplicationContext extends GenericWebApplicationCon
 	private WebServer startWebServer() {
 		WebServer webServer = this.webServer;
 		if (webServer != null) {
+			// 完成最终的启动操作，将loadOnStartUp > 0 的Servlet启动起来
 			webServer.start();
 		}
 		return webServer;

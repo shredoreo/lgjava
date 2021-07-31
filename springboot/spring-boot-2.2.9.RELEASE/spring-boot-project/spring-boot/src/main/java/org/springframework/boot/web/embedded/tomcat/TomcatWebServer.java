@@ -196,10 +196,13 @@ public class TomcatWebServer implements WebServer {
 				addPreviouslyRemovedConnectors();
 				Connector connector = this.tomcat.getConnector();
 				if (connector != null && this.autoStart) {
+					// 启动LoadOnStartup > 0 相关的Servlet
 					performDeferredLoadOnStartup();
 				}
+				// 检查Connector是否都启动了
 				checkThatConnectorsHaveStarted();
 				this.started = true;
+				// 打印最终启动完成的日志
 				logger.info("Tomcat started on port(s): " + getPortsDescription(true) + " with context path '"
 						+ getContextPath() + "'");
 			}

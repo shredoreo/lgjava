@@ -65,8 +65,9 @@ public class DataSourceAutoConfiguration {
 	}
 
 	@Configuration(proxyBeanMethods = false)
-	@Conditional(PooledDataSourceCondition.class)
+	@Conditional(PooledDataSourceCondition.class)//根据内部类PooledDataSourceCondition的相关条件判断
 	@ConditionalOnMissingBean({ DataSource.class, XADataSource.class })
+	// 导入数据源的配置类
 	@Import({ DataSourceConfiguration.Hikari.class, DataSourceConfiguration.Tomcat.class,
 			DataSourceConfiguration.Dbcp2.class, DataSourceConfiguration.Generic.class,
 			DataSourceJmxConfiguration.class })
@@ -84,6 +85,7 @@ public class DataSourceAutoConfiguration {
 			super(ConfigurationPhase.PARSE_CONFIGURATION);
 		}
 
+		// type：显式的 连接池类型
 		@ConditionalOnProperty(prefix = "spring.datasource", name = "type")
 		static class ExplicitType {
 
