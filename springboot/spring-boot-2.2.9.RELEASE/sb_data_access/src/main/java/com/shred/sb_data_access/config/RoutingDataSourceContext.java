@@ -11,12 +11,10 @@ public class RoutingDataSourceContext {
 		threadLocal.set(key);
 	}
 
-
 	public static String getDataSourceRoutingKey(){
 		String key = threadLocal.get();
 		return key == null? MASTER : key;
 	}
-
 
 	public void close(){
 		threadLocal.remove();

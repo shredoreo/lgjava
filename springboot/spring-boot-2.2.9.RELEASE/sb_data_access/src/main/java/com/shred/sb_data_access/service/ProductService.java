@@ -22,5 +22,4 @@ public class ProductService {
 		System.out.println(allProductS);
 	}
 
-
 }
