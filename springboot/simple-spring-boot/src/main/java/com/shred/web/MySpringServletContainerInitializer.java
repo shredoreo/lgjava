@@ -11,8 +11,9 @@ public class MySpringServletContainerInitializer implements ServletContainerInit
 
     @Override
     public void onStartup(Set<Class<?>> set, ServletContext servletContext) throws ServletException {
+        System.out.println("【【【【【【【【【");
+        System.out.println("com.shred.web.MySpringServletContainerInitializer.onStartup");
         MyWebApplicationInitializer myWebApplicationInitializer = new MyWebApplicationInitializer();
         myWebApplicationInitializer.onStartup(servletContext);
-
     }
 }

@@ -13,6 +13,11 @@ import java.io.File;
 import java.io.IOException;
 
 public class SpringApplication {
+
+    public static void main(String[] args) throws Exception {
+        new SpringApplication().run();
+    }
+
     public  void run() throws Exception {
 
         onRefresh();
