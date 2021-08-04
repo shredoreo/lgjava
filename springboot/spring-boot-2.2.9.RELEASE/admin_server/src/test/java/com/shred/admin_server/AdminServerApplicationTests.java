@@ -1,10 +1,10 @@
-package com.shred.springbootmytest;
+package com.shred.admin_server;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class SpringBootMytestApplicationTests {
+class AdminServerApplicationTests {
 
 	@Test
 	void contextLoads() {
