@@ -11,6 +11,7 @@ public  abstract class HttpServlet implements Servlet{
 
     @Override
     public void service(Request request, Response response) throws Exception {
+        Thread.sleep(10000);
         if ("GET".equalsIgnoreCase(request.getMethod())){
             doGet(request, response);
         } else if ("POST".equalsIgnoreCase(request.getMethod())){

@@ -4,6 +4,7 @@ import com.shred.minicat.server.HttpProtocolUtil;
 import com.shred.minicat.server.Request;
 import com.shred.minicat.server.Response;
 import com.shred.minicat.server.servlet.HttpServlet;
+import com.shred.minicat.server.thread.RequestProcessor;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
@@ -18,6 +19,7 @@ import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.*;
 
 public class BootStrap {
     private int port = 8080;
@@ -28,6 +30,10 @@ public class BootStrap {
      */
     public void start() throws Exception {
         loadServlet();
+
+        //创建线程池
+        ThreadPoolExecutor threadPoolExecutor = accuireThreadPoolExecutor();
+
 
         // v1.0 需求：请求http://localhost:8080/ 返回固定的字符串
         ServerSocket serverSocket = new ServerSocket(port);
@@ -58,7 +64,7 @@ public class BootStrap {
         /**
          * v3 请求动态资源：servlet
          */
-        while (true){
+        /*while (true){
             Socket socket = serverSocket.accept();
             InputStream inputStream = socket.getInputStream();
             Request request = new Request(inputStream);
@@ -74,8 +80,42 @@ public class BootStrap {
             }
 
             socket.close();
-        }
+        }*/
 
+        /**
+         * v3.1 多线程改造
+         */
+       /* while (true){
+            Socket socket = serverSocket.accept();
+            RequestProcessor requestProcessor = new RequestProcessor(socket, servletMap);
+            requestProcessor.start();
+        }*/
+
+        /**
+         * v3.2 多线程改造 使用 线程池
+         */
+        while (true){
+            Socket socket = serverSocket.accept();
+            RequestProcessor requestProcessor = new RequestProcessor(socket, servletMap);
+//            requestProcessor.start();
+            threadPoolExecutor.execute(requestProcessor);
+        }
+    }
+
+    private ThreadPoolExecutor accuireThreadPoolExecutor() {
+        int corePoolSize = 10;
+        int maximumPoolSize = 50;
+        long keepAliveTime = 100L;
+        TimeUnit unit = TimeUnit.SECONDS;
+        BlockingQueue<Runnable> workQueue = new ArrayBlockingQueue<>(50);
+        ThreadFactory threadFactory =  Executors.defaultThreadFactory();
+        RejectedExecutionHandler defaultHandler = new ThreadPoolExecutor.AbortPolicy();
+
+        ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(
+                corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue,
+                threadFactory, defaultHandler
+        );
+        return threadPoolExecutor;
     }
 
     /**
