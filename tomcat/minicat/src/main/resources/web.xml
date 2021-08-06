@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<web-app>
+
+    <servlet>
+        <servlet-name>shred</servlet-name>
+        <servlet-class>com.shred.minicat.server.servlet.ShredServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>shred</servlet-name>
+        <url-pattern>/shred</url-pattern>
+    </servlet-mapping>
+
+</web-app>

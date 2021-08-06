@@ -22,7 +22,6 @@ public class Response {
      */
     public void outPut(String content) throws IOException {
         outputStream.write(content.getBytes(StandardCharsets.UTF_8));
-
     }
 
     /**
