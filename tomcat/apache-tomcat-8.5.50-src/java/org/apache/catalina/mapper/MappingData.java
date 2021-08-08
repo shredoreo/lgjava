@@ -28,7 +28,7 @@ import org.apache.tomcat.util.buf.MessageBytes;
  *
  * @author Remy Maucherat
  */
-public class MappingData {
+public class MappingData {//封装一次请求所对应的信息
 
     public Host host = null;
     public Context context = null;

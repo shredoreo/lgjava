@@ -41,7 +41,7 @@ public abstract class AbstractChunk implements Cloneable, Serializable {
     private int limit = -1;
 
     protected int start;
-    protected int end;
+    protected int end;//@@?？什么作用？
 
 
     /**

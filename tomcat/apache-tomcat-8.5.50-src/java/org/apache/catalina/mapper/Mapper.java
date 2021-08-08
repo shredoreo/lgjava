@@ -740,7 +740,7 @@ public final class Mapper {
             throw new AssertionError();
         }
 
-        // Virtual host mapping
+        // Virtual host mapping 找到mappedHost
         MappedHost[] hosts = this.hosts;
         MappedHost mappedHost = exactFindIgnoreCase(hosts, host);
         if (mappedHost == null) {
@@ -773,7 +773,7 @@ public final class Mapper {
 
         uri.setLimit(-1);
 
-        // Context mapping
+        // Context mapping 找到context
         ContextList contextList = mappedHost.contextList;
         MappedContext[] contexts = contextList.contexts;
         int pos = find(contexts, uri);
@@ -843,6 +843,7 @@ public final class Mapper {
         mappingData.contextSlashCount = contextVersion.slashCount;
 
         // Wrapper mapping
+        // 找到servlet
         if (!contextVersion.isPaused()) {
             internalMapWrapper(contextVersion, uri, mappingData);
         }

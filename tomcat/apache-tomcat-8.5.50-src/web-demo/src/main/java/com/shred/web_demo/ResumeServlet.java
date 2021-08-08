@@ -7,13 +7,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
-
-@WebServlet(name = "resumeServlet", value = "/resume/add")
+//http://localhost:8080/web-demo/resume/add
+//@WebServlet(name = "resumeServlet", value = "/resume/add")
 public class ResumeServlet extends HttpServlet {
     private String message;
 
     public void init() {
-        message = "Hello World!";
+        message = "Hello World! /resume/add";
     }
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
