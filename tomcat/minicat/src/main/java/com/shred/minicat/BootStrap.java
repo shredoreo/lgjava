@@ -29,7 +29,8 @@ public class BootStrap {
      * 初始化展开的操作
      */
     public void start() throws Exception {
-        loadServlet();
+//        loadConfig();
+//        loadServlet();
 
         //创建线程池
         ThreadPoolExecutor threadPoolExecutor = accuireThreadPoolExecutor();
@@ -97,10 +98,11 @@ public class BootStrap {
         while (true){
             Socket socket = serverSocket.accept();
             RequestProcessor requestProcessor = new RequestProcessor(socket, servletMap);
-//            requestProcessor.start();
             threadPoolExecutor.execute(requestProcessor);
         }
     }
+
+
 
     private ThreadPoolExecutor accuireThreadPoolExecutor() {
         int corePoolSize = 10;
@@ -118,50 +120,9 @@ public class BootStrap {
         return threadPoolExecutor;
     }
 
-    /**
-     * 加载解析web.xml 初始化servlet
-     */
-    private void loadServlet() {
-        InputStream resourceAsStream = this.getClass().getClassLoader().getResourceAsStream("web.xml");
-        SAXReader saxReader = new SAXReader();
-        try {
-            Document document = saxReader.read(resourceAsStream);
-            Element rootElement = document.getRootElement();
 
-            List<Element> list = rootElement.selectNodes("//servlet");
-            for (int i = 0; i < list.size(); i++) {
-                /*
-    <servlet>
-        <servlet-name>shred</servlet-name>
-        <servlet-class>com.shred.minicat.server.servlet.ShredServlet</servlet-class>
-    </servlet>
 
-    <servlet-mapping>
-        <servlet-name>shred</servlet-name>
-        <url-pattern>/shred</url-pattern>
-    </servlet-mapping>
-                 */
-                Element element = list.get(i);
-                Element servletNameElm = (Element) element.selectSingleNode("servlet-name");
-                String servletName = servletNameElm.getStringValue();
 
-                Element servletClassElm = (Element) element.selectSingleNode("servlet-class");
-                String servletClass = servletClassElm.getStringValue();
-
-                Element servletMappingElm = (Element) rootElement.selectSingleNode("/web-app/servlet-mapping[servlet-name='" + servletName + "']");
-                String urlPattern = servletMappingElm.selectSingleNode("url-pattern").getStringValue();
-
-                servletMap.put(urlPattern, (HttpServlet) Class.forName(servletClass).newInstance());
-            }
-
-        } catch (DocumentException | ClassNotFoundException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InstantiationException e) {
-            e.printStackTrace();
-        }
-    }
 
 
     public static void main(String[] args) throws Exception {
