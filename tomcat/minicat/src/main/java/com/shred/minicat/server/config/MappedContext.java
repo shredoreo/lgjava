@@ -6,6 +6,7 @@ import java.util.HashMap;
 
 public class MappedContext {
     private String appPath;
+    private HashMap<String, Wrapper> mappedWrapper = new HashMap<>();
 
     public String getAppPath() {
         return appPath;
@@ -15,13 +16,11 @@ public class MappedContext {
         this.appPath = appPath;
     }
 
-    public HashMap<String, HttpServlet> getServletMap() {
-        return servletMap;
+    public HashMap<String, Wrapper> getMappedWrapper() {
+        return mappedWrapper;
     }
 
-    public void setServletMap(HashMap<String, HttpServlet> servletMap) {
-        this.servletMap = servletMap;
+    public void setMappedWrapper(HashMap<String, Wrapper> mappedWrapper) {
+        this.mappedWrapper = mappedWrapper;
     }
-
-    private HashMap<String, HttpServlet> servletMap = new HashMap<>();
 }

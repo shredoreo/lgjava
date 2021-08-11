@@ -3,6 +3,7 @@ package com.shred.minicat;
 import com.shred.minicat.server.HttpProtocolUtil;
 import com.shred.minicat.server.Request;
 import com.shred.minicat.server.Response;
+import com.shred.minicat.server.config.Configuration;
 import com.shred.minicat.server.servlet.HttpServlet;
 import com.shred.minicat.server.thread.RequestProcessor;
 import org.dom4j.Document;
@@ -24,6 +25,35 @@ import java.util.concurrent.*;
 public class BootStrap {
     private int port = 8080;
     private HashMap<String, HttpServlet> servletMap = new HashMap<>();
+    private Configuration configuration;
+
+    public void startV4()throws Exception{
+        this.configuration = new Configuration();
+
+        configuration.loadConfig();
+        //监听端口
+        List<Integer> portList = configuration.getPortList();
+
+
+        //创建线程池
+        ThreadPoolExecutor threadPoolExecutor = accuireThreadPoolExecutor();
+
+
+        //请求http://localhost:8080/
+
+        Integer port = portList.get(0);
+        ServerSocket serverSocket = new ServerSocket(port);
+        System.out.println("===>>>Minicat start on port:"+ port);
+
+        /**
+         * v4.0 webapps
+         */
+        while (true){
+            Socket socket = serverSocket.accept();
+            RequestProcessor requestProcessor = new RequestProcessor(socket, servletMap);
+            threadPoolExecutor.execute(requestProcessor);
+        }
+    }
 
     /**
      * 初始化展开的操作
@@ -31,6 +61,8 @@ public class BootStrap {
     public void start() throws Exception {
 //        loadConfig();
 //        loadServlet();
+        Configuration configuration = new Configuration();
+        configuration.loadConfig();
 
         //创建线程池
         ThreadPoolExecutor threadPoolExecutor = accuireThreadPoolExecutor();
@@ -95,11 +127,14 @@ public class BootStrap {
         /**
          * v3.2 多线程改造 使用 线程池
          */
-        while (true){
+        /*while (true){
             Socket socket = serverSocket.accept();
             RequestProcessor requestProcessor = new RequestProcessor(socket, servletMap);
             threadPoolExecutor.execute(requestProcessor);
-        }
+        }*/
+
+
+
     }
 
 
@@ -126,7 +161,7 @@ public class BootStrap {
 
 
     public static void main(String[] args) throws Exception {
-        new BootStrap().start();
+        new BootStrap().startV4();
     }
 
     public int getPort() {

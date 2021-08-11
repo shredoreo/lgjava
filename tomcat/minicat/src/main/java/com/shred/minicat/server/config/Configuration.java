@@ -1,10 +1,8 @@
 package com.shred.minicat.server.config;
 
-import com.shred.minicat.server.servlet.HttpServlet;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
-import org.dom4j.Node;
 import org.dom4j.io.SAXReader;
 
 import java.io.*;
@@ -13,11 +11,27 @@ import java.util.HashMap;
 import java.util.List;
 
 public class Configuration {
-    private int port;
-    private List<String> portList = new ArrayList<>();
+    private static List<Integer> portList = new ArrayList<>();
+    public static ArrayList<MappedHost> mappedHosts = new ArrayList<>();
 
 
-    private void loadConfig() {
+    public List<Integer> getPortList() {
+        return portList;
+    }
+
+    public void setPortList(List<Integer> portList) {
+        this.portList = portList;
+    }
+
+    public ArrayList<MappedHost> getMappedHosts() {
+        return mappedHosts;
+    }
+
+    public void setMappedHosts(ArrayList<MappedHost> mappedHosts) {
+        this.mappedHosts = mappedHosts;
+    }
+
+    public void loadConfig() {
         InputStream resourceAsStream = this.getClass().getClassLoader().getResourceAsStream("server.xml");
         SAXReader saxReader = new SAXReader();
 
@@ -47,8 +61,10 @@ public class Configuration {
     }
 
     private void resolveEngine(Element engineElm) {
+        //获取host节点
         List<Element> hostList = engineElm.selectNodes("//host");
 
+        //处理host节点
         resolveHosts(hostList);
 
     }
@@ -64,6 +80,7 @@ public class Configuration {
             List<Element> contextList = host.selectNodes("//context");
             resolveContexts(contextList, mappedHost);
 
+            this.mappedHosts.add(mappedHost);
         }
 
     }
@@ -74,8 +91,9 @@ public class Configuration {
             InputStream resourceAsStream = this.getClass().getClassLoader().getResourceAsStream(appBase);
             File file = new File(appBase);
             // webapp文件夹
-            File[] files = file.listFiles();
+            File[] files = file.listFiles(((dir, name) -> !name.startsWith(".")));
             for (File file1 : files) {
+                //文件夹名称即为app名称
                 String appName = file1.getName();
                 File[] webXmls = file1.listFiles(new FilenameFilter() {
                     @Override
@@ -84,17 +102,19 @@ public class Configuration {
                     }
                 });
                 //目录下存在web.xml,读取第一个
-                if (webXmls.length>0){
+                if (webXmls!= null && webXmls.length>0){
                     File webXml = webXmls[0];
-                    WebAppLoader webAppLoader = new WebAppLoader();
+                    WebAppLoader webAppLoader = new WebAppLoader(webXml );
                     try {
                         //加载并解析web.xml
-                        webAppLoader.loadServlet(new FileInputStream(webXml));
-                        HashMap<String, HttpServlet> servletMap = webAppLoader.getServletMap();
+                        webAppLoader.loadServlet();
+                        // 获取servletMap
+                        HashMap<String, Wrapper> mappedWrapper = webAppLoader.getMappedWrapper();
+
                         // 创建context对象
                         MappedContext mappedContext = new MappedContext();
                         mappedContext.setAppPath(appName);
-                        mappedContext.setServletMap(servletMap);
+                        mappedContext.setMappedWrapper(mappedWrapper);
 
                         //将context加入到host中
                         mappedHost.getContextList().add(mappedContext);
@@ -132,7 +152,7 @@ public class Configuration {
         for (Element element : connectorList) {
             String port = element.attributeValue("port");
             //保存端口号
-            portList.add(port);
+            portList.add(Integer.parseInt(port));
         }
 
     }

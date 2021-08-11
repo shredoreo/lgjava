@@ -3,7 +3,7 @@
     <service>
         <connector port="8080"/>
         <engine>
-            <host name="localhost" appBase="/Users/shred/webapps">
+            <host name="localhost" appBase="/Users/shred/develop/webapps">
 
             </host>
         </engine>

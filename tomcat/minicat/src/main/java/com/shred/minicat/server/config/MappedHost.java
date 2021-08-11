@@ -1,5 +1,6 @@
 package com.shred.minicat.server.config;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -7,7 +8,7 @@ import java.util.List;
 public class MappedHost {
     String name;
     String appBase;
-    List<MappedContext> contextList;
+    List<MappedContext> contextList = new ArrayList<>();
 
     public String getAppBase() {
         return appBase;

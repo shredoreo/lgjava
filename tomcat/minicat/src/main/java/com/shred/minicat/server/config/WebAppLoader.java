@@ -1,32 +1,50 @@
 package com.shred.minicat.server.config;
 
+import com.shred.minicat.server.loader.WebAppClassLoader;
 import com.shred.minicat.server.servlet.HttpServlet;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
 
 public class WebAppLoader {
 
-    private HashMap<String, HttpServlet> servletMap = new HashMap<>();
+    private final File webXmlFile;
+    private HashMap<String, Wrapper> mappedWrapper = new HashMap<String, Wrapper>();
+    private WebAppClassLoader webAppClassLoader ;
 
-    public HashMap<String, HttpServlet> getServletMap() {
-        return servletMap;
+    public WebAppLoader(File webXml) {
+        this.webXmlFile = webXml;
+        String parentDir = webXmlFile.getParent();
+        //规定web.xml所在目录的server/文件夹为当前app的classpath
+        String webAppClasspath = parentDir + "/"+"server/";
+        this.webAppClassLoader = new WebAppClassLoader(webAppClasspath);
     }
 
-    public void setServletMap(HashMap<String, HttpServlet> servletMap) {
-        this.servletMap = servletMap;
+    public HashMap<String, Wrapper> getMappedWrapper() {
+        return mappedWrapper;
+    }
+
+    public void setMappedWrapper(HashMap<String, Wrapper> mappedWrapper) {
+        this.mappedWrapper = mappedWrapper;
     }
 
     /**
      * 加载解析web.xml 初始化servlet
      */
-    public void loadServlet( InputStream resourceAsStream ) {
+    public void loadServlet( ) throws FileNotFoundException {
+
+        InputStream resourceAsStream = new FileInputStream(webXmlFile);
+
 //        InputStream resourceAsStream = this.getClass().getClassLoader().getResourceAsStream("web.xml");
+
         SAXReader saxReader = new SAXReader();
         try {
             Document document = saxReader.read(resourceAsStream);
@@ -51,11 +69,16 @@ public class WebAppLoader {
 
                 Element servletClassElm = (Element) element.selectSingleNode("servlet-class");
                 String servletClass = servletClassElm.getStringValue();
+//                String classUrl = servletClass.replaceAll(".", "/");
+                //加载servlet
+                Class<?> aClass = webAppClassLoader.loadClass(servletClass);
 
                 Element servletMappingElm = (Element) rootElement.selectSingleNode("/web-app/servlet-mapping[servlet-name='" + servletName + "']");
                 String urlPattern = servletMappingElm.selectSingleNode("url-pattern").getStringValue();
 
-                servletMap.put(urlPattern, (HttpServlet) Class.forName(servletClass).newInstance());
+                Wrapper wrapper = new Wrapper();
+                wrapper.setHttpServlet((HttpServlet) aClass.newInstance());
+                mappedWrapper.put(urlPattern, wrapper);
             }
 
         } catch (DocumentException | ClassNotFoundException e) {

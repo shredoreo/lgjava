@@ -3,7 +3,7 @@
 
     <servlet>
         <servlet-name>shred</servlet-name>
-        <servlet-class>com.shred.minicat.server.servlet.ShredServlet</servlet-class>
+        <servlet-class>servlet.ShredServlet2</servlet-class>
     </servlet>
 
     <servlet-mapping>
