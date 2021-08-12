@@ -2,6 +2,8 @@
 <server>
     <service>
         <connector port="8080"/>
+        <connector port="8081"/>
+
         <engine>
             <host name="localhost" appBase="/Users/shred/develop/webapps">
 

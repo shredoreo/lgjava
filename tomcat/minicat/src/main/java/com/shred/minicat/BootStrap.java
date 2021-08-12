@@ -5,6 +5,7 @@ import com.shred.minicat.server.Request;
 import com.shred.minicat.server.Response;
 import com.shred.minicat.server.config.Configuration;
 import com.shred.minicat.server.servlet.HttpServlet;
+import com.shred.minicat.server.thread.PortProcessor;
 import com.shred.minicat.server.thread.RequestProcessor;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
@@ -24,35 +25,40 @@ import java.util.concurrent.*;
 
 public class BootStrap {
     private int port = 8080;
-    private HashMap<String, HttpServlet> servletMap = new HashMap<>();
+    private final HashMap<String, HttpServlet> servletMap = new HashMap<>();
     private Configuration configuration;
+
+    private  static ThreadPoolExecutor poolExecutor;
 
     public void startV4()throws Exception{
         this.configuration = new Configuration();
-
+        //解析server.xml
         configuration.loadConfig();
         //监听端口
         List<Integer> portList = configuration.getPortList();
 
-
         //创建线程池
         ThreadPoolExecutor threadPoolExecutor = accuireThreadPoolExecutor();
 
-
         //请求http://localhost:8080/
-
-        Integer port = portList.get(0);
-        ServerSocket serverSocket = new ServerSocket(port);
-        System.out.println("===>>>Minicat start on port:"+ port);
 
         /**
          * v4.0 webapps
          */
+        for (Integer port : portList) {
+            PortProcessor portProcessor = new PortProcessor(port);
+            threadPoolExecutor.execute(portProcessor);
+        }
+/*
+        Integer port = portList.get(0);
+        ServerSocket serverSocket = new ServerSocket(port);
+        System.out.println("===>>>Minicat start on port:"+ port);
+
         while (true){
             Socket socket = serverSocket.accept();
             RequestProcessor requestProcessor = new RequestProcessor(socket, servletMap);
             threadPoolExecutor.execute(requestProcessor);
-        }
+        }*/
     }
 
     /**
@@ -139,20 +145,28 @@ public class BootStrap {
 
 
 
-    private ThreadPoolExecutor accuireThreadPoolExecutor() {
-        int corePoolSize = 10;
-        int maximumPoolSize = 50;
-        long keepAliveTime = 100L;
-        TimeUnit unit = TimeUnit.SECONDS;
-        BlockingQueue<Runnable> workQueue = new ArrayBlockingQueue<>(50);
-        ThreadFactory threadFactory =  Executors.defaultThreadFactory();
-        RejectedExecutionHandler defaultHandler = new ThreadPoolExecutor.AbortPolicy();
+    public static ThreadPoolExecutor accuireThreadPoolExecutor() {
+        if(poolExecutor == null){
+            synchronized (BootStrap.class){
+                if(poolExecutor == null){
 
-        ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(
-                corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue,
-                threadFactory, defaultHandler
-        );
-        return threadPoolExecutor;
+                    int corePoolSize = 10;
+                    int maximumPoolSize = 50;
+                    long keepAliveTime = 100L;
+                    TimeUnit unit = TimeUnit.SECONDS;
+                    BlockingQueue<Runnable> workQueue = new ArrayBlockingQueue<>(50);
+                    ThreadFactory threadFactory =  Executors.defaultThreadFactory();
+                    RejectedExecutionHandler defaultHandler = new ThreadPoolExecutor.AbortPolicy();
+
+                    poolExecutor =  new ThreadPoolExecutor(
+                            corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue,
+                            threadFactory, defaultHandler
+                    );
+
+                }
+            }
+        }
+        return poolExecutor;
     }
 
 

@@ -72,11 +72,14 @@ public class Configuration {
     private void resolveHosts(List<Element> hostList) {
         for (Element host : hostList) {
             MappedHost mappedHost = new MappedHost();
+            //主机名称
             String name = host.attributeValue("name");
+            // app所在根目录
             String appBase = host.attributeValue("appBase");
             mappedHost.setName(name);
             mappedHost.setAppBase(appBase);
 
+            // context节点
             List<Element> contextList = host.selectNodes("//context");
             resolveContexts(contextList, mappedHost);
 
@@ -108,7 +111,8 @@ public class Configuration {
                     try {
                         //加载并解析web.xml
                         webAppLoader.loadServlet();
-                        // 获取servletMap
+                        // 获取sMappedWrapper
+                        //urlPattern ->Wrapper（servlet）
                         HashMap<String, Wrapper> mappedWrapper = webAppLoader.getMappedWrapper();
 
                         // 创建context对象
@@ -123,29 +127,15 @@ public class Configuration {
                     }
                 }
             }
-            readWebXml(file);
         }
 
-        for (Element context : contextList) {
+       /* for (Element context : contextList) {
 
 
-        }
+        }*/
 
     }
 
-    private void readWebXml(File file) {
-        if (file.isDirectory()) {
-            File[] files = file.listFiles();
-            for (File file1 : files) {
-                readWebXml(file1);
-            }
-        } else {
-            String name = file.getName();
-            if (name.equalsIgnoreCase("web.xml")) {
-
-            }
-        }
-    }
 
     private void resolveConnectors(List<Element> connectorList) {
 

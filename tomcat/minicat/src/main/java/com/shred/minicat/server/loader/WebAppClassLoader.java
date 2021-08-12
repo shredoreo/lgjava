@@ -30,6 +30,7 @@ public class WebAppClassLoader extends ClassLoader {
     private byte[] loadData(String name) throws Exception {
 
         name=name.replace('.', '/');
+        //读取文件
         File file = new File(classpath + name+ filetype);
 
         if (!file.exists()){

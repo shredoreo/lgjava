@@ -43,8 +43,6 @@ public class WebAppLoader {
 
         InputStream resourceAsStream = new FileInputStream(webXmlFile);
 
-//        InputStream resourceAsStream = this.getClass().getClassLoader().getResourceAsStream("web.xml");
-
         SAXReader saxReader = new SAXReader();
         try {
             Document document = saxReader.read(resourceAsStream);
@@ -52,24 +50,14 @@ public class WebAppLoader {
 
             List<Element> list = rootElement.selectNodes("//servlet");
             for (int i = 0; i < list.size(); i++) {
-                /*
-    <servlet>
-        <servlet-name>shred</servlet-name>
-        <servlet-class>com.shred.minicat.server.servlet.ShredServlet</servlet-class>
-    </servlet>
 
-    <servlet-mapping>
-        <servlet-name>shred</servlet-name>
-        <url-pattern>/shred</url-pattern>
-    </servlet-mapping>
-                 */
                 Element element = list.get(i);
                 Element servletNameElm = (Element) element.selectSingleNode("servlet-name");
                 String servletName = servletNameElm.getStringValue();
 
                 Element servletClassElm = (Element) element.selectSingleNode("servlet-class");
                 String servletClass = servletClassElm.getStringValue();
-//                String classUrl = servletClass.replaceAll(".", "/");
+
                 //加载servlet
                 Class<?> aClass = webAppClassLoader.loadClass(servletClass);
 
@@ -77,7 +65,9 @@ public class WebAppLoader {
                 String urlPattern = servletMappingElm.selectSingleNode("url-pattern").getStringValue();
 
                 Wrapper wrapper = new Wrapper();
+                //实例化servlet
                 wrapper.setHttpServlet((HttpServlet) aClass.newInstance());
+                //urlPattern ->servlet
                 mappedWrapper.put(urlPattern, wrapper);
             }
 

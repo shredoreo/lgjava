@@ -23,31 +23,34 @@ public class Mapper {
     }
 
     private void internalMapping(Request request, MappingData mappingData) {
+        // 请求主机
         String hostName = request.getHostName();
-        // eg /app1/a.html
+        // 请求uri： /app1/a.html
         String url = request.getUrl();
+
         String[] uri = url.split("/");
-        // app1
+        // 请求应用：app1
         String appName = uri[1];
 
+        //urlPattern
         String appUri = "/"+uri[2];
 
+
+        //查找host
         ArrayList<MappedHost> mappedHosts = Configuration.mappedHosts;
         MappedHost mappedHost1 = mappedHosts.stream()
                 .filter(mappedHost -> mappedHost.getName().equals(hostName)).findFirst().get();
         mappingData.mappedHost = mappedHost1;
 
+        //查找webapp
         MappedContext mappedContext1 = mappedHost1.getContextList().stream()
                 .filter(mappedContext -> mappedContext.getAppPath().equals(appName)).findFirst().get();
         mappingData.mappedContext = mappedContext1;
 
+        //查找servlet
         HashMap<String, Wrapper> mappedWrapper = mappedContext1.getMappedWrapper();
         Wrapper wrapper = mappedWrapper.get(appUri);
         mappingData.wrapper = wrapper;
-
-//        HttpServlet httpServlet = wrapper.getHttpServlet();
-
-
 
     }
 

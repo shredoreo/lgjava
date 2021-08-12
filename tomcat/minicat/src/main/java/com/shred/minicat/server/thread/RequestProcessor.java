@@ -15,6 +15,10 @@ public class RequestProcessor extends Thread{
     private Socket socket;
     private Map<String, HttpServlet> servletMap;
 
+    public RequestProcessor(Socket socket) {
+        this.socket = socket;
+    }
+
     public RequestProcessor(Socket socket, Map<String, HttpServlet> servletMap) {
         this.socket = socket;
         this.servletMap = servletMap;
