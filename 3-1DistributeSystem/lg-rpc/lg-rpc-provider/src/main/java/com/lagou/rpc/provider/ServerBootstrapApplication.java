@@ -24,7 +24,7 @@ public class ServerBootstrapApplication implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         new Thread(() ->
-                rpcServer.startServer("127.0.0.1", 8899))
+                rpcServer.startServer("127.0.0.1", 8898))
                 .start();
     }
 }

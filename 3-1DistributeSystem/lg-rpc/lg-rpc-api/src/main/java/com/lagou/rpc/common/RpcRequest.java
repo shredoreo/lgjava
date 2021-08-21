@@ -1,13 +1,13 @@
 package com.lagou.rpc.common;
 
 import lombok.Data;
-
-import java.util.Arrays;
+import lombok.NoArgsConstructor;
 
 /**
  * 封装的请求对象
  */
 @Data
+@NoArgsConstructor
 public class RpcRequest {
 
     /**

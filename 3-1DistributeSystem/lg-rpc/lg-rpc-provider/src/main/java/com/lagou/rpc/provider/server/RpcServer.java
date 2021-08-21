@@ -49,6 +49,7 @@ public class RpcServer implements DisposableBean {
 
             ChannelFuture sync = serverBootstrap.bind(ip, port).sync();
             System.out.println("=====服务端启动成功=====");
+            //监听服务端关闭
             sync.channel().closeFuture().sync();
         } catch (InterruptedException e) {
             e.printStackTrace();

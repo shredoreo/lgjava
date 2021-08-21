@@ -4,6 +4,8 @@ import com.alibaba.fastjson.JSON;
 import com.lagou.rpc.common.RpcRequest;
 import com.lagou.rpc.common.RpcResponse;
 import com.lagou.rpc.provider.anno.RpcService;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import org.springframework.beans.BeansException;
@@ -28,6 +30,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * 5、给客户端进行响应
  */
 @Component
+@ChannelHandler.Sharable//共享
 public class RpcServerHandler extends SimpleChannelInboundHandler<String> implements ApplicationContextAware {
 
     private ConcurrentHashMap<String, Object> SERVICE_INSTANCE_MAP = new ConcurrentHashMap<String, Object>();
@@ -93,6 +96,7 @@ public class RpcServerHandler extends SimpleChannelInboundHandler<String> implem
      */
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        //获取容器中标注了 RpcService 接口的bean
         Map<String, Object> serviceMap = applicationContext.getBeansWithAnnotation(RpcService.class);
         if (!CollectionUtils.isEmpty(serviceMap)) {
             Set<Map.Entry<String, Object>> entries = serviceMap.entrySet();

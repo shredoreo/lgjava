@@ -64,10 +64,9 @@ public class RpcClient {
 
         try {
             channel = bootstrap.connect(ip, port).sync().channel();
+            System.out.println("=====客户端连接成功！=====");
         } catch (InterruptedException e) {
             e.printStackTrace();
-
-        } finally {
             close();
         }
     }
@@ -75,7 +74,7 @@ public class RpcClient {
     /**
      *  * 2、提供给调用者主动关闭资源的方法
      */
-    private void close() {
+    public void close() {
         if (channel!=null){
             channel.close();
         }
@@ -89,7 +88,7 @@ public class RpcClient {
      *  * 3、提供消息发送的方法
      * @return
      */
-    private Object send(String msg) throws ExecutionException, InterruptedException {
+    public Object send(String msg) throws ExecutionException, InterruptedException {
         //设置请求信息
         rpcClientHandler.setRequestMsg(msg);
         //执行线程

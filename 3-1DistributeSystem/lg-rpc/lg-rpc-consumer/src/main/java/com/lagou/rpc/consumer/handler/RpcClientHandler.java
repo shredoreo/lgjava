@@ -10,6 +10,7 @@ import java.util.concurrent.Callable;
  * 1、发送消息
  * 2、接收消息
  */
+// todo Callable
 //使用线程的等待唤醒机制
 public class RpcClientHandler extends SimpleChannelInboundHandler<String> implements Callable {
     //就绪时赋值
@@ -27,12 +28,13 @@ public class RpcClientHandler extends SimpleChannelInboundHandler<String> implem
 
     /**
      * 通道读取就绪
+     *
      * @param channelHandlerContext
      * @param s
      * @throws Exception
      */
     @Override
-    protected void channelRead0(ChannelHandlerContext channelHandlerContext, String s) throws Exception {
+    protected synchronized void channelRead0(ChannelHandlerContext channelHandlerContext, String s) throws Exception {
         responseMsg = s;
         //唤醒等待的线程
         notify();
@@ -40,22 +42,24 @@ public class RpcClientHandler extends SimpleChannelInboundHandler<String> implem
 
     /**
      * 通道就绪事件
+     *
      * @param ctx
      * @throws Exception
      */
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
-
+        this.ctx = ctx;
 
     }
 
     /**
      * 发送消息到服务端
+     *
      * @return
      * @throws Exception
      */
     @Override
-    public Object call() throws Exception {
+    public synchronized Object call() throws Exception {
         //发消息
         ctx.writeAndFlush(requestMsg);
         //线程 等待
