@@ -15,10 +15,10 @@ public class CreateZkSession implements Watcher {
     public static void main(String[] args) throws IOException, InterruptedException {
         /*
             客户端可以通过创建一个zk实例来连接zk服务器
-            new Zookeeper(connectString,sesssionTimeOut,Wather)
+            new Zookeeper(connectString,sessionTimeOut,Watcher)
             connectString: 连接地址:IP:端口
-            sesssionTimeOut:会话超时时间:单位毫秒
-            Wather:监听器(当特定事件触发监听时，zk会通过watcher通知到客户端)
+            sessionTimeOut:会话超时时间:单位毫秒
+            Watcher:监听器(当特定事件触发监听时，zk会通过watcher通知到客户端)
         */
         ZooKeeper zooKeeper = new ZooKeeper("tx1:2181", 5000, new CreateZkSession());
         System.out.println(zooKeeper.getState());

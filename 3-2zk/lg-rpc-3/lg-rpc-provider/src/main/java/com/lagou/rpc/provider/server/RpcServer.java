@@ -2,6 +2,7 @@ package com.lagou.rpc.provider.server;
 
 import com.lagou.rpc.provider.handler.RpcServerHandler;
 import com.lagou.rpc.provider.register.RegisterCenter;
+import com.lagou.rpc.provider.zk.ServerRegistry;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -11,9 +12,12 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.string.StringDecoder;
 import io.netty.handler.codec.string.StringEncoder;
+import org.apache.zookeeper.KeeperException;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.io.IOException;
 
 /**
  * 启动类
@@ -26,6 +30,9 @@ public class RpcServer implements DisposableBean {
 
     @Autowired
     RegisterCenter registerCenter;
+
+    @Autowired
+    ServerRegistry  serverRegistry;
 
     private NioEventLoopGroup bossGroup;
     private NioEventLoopGroup workerGroup;
@@ -57,10 +64,17 @@ public class RpcServer implements DisposableBean {
             rpcServerHandler.SERVICE_INSTANCE_MAP.keySet().forEach(
                     k -> registerCenter.register(k, ip + ":"+ port));
 
+            // 服务注册 直接注册当前服务的地址
+            serverRegistry.register(ip +":"+port);
+
             System.out.println("=====服务端启动成功=====");
             //监听服务端关闭
             sync.channel().closeFuture().sync();
         } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (KeeperException e) {
             e.printStackTrace();
         } finally {
             close();

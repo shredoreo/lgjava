@@ -24,6 +24,7 @@ public class UseZkClient {
     private static void api(ZkClient zkClient) throws InterruptedException {
         String path = "/shred-zkClient-Ep";
         boolean exists = zkClient.exists(path);
+        System.out.println(path+"--节点--" + (exists?"存在": "不存在"));
         if (!exists){
             zkClient.createEphemeral(path, "123");
         }
@@ -54,7 +55,7 @@ public class UseZkClient {
 
     private static void getNodeChildren(ZkClient zkClient) throws InterruptedException {
         String path = "/shred-pppp";
-        System.out.println("=====测试子节点 ===" +path);
+        System.out.println("=====测试子节点=====" +path);
         if (zkClient.exists(path)){
             zkClient.deleteRecursive(path);
         }

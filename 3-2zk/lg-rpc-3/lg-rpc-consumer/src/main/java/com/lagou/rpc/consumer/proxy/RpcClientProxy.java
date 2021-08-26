@@ -34,6 +34,8 @@ public class RpcClientProxy {
                         rpcRequest.setParameterTypes(method.getParameterTypes());
 
                         String discoverAddress = serviceDiscovery.discover(serviceClass.getName());
+
+
                         System.out.println("获取的服务端地址：" + discoverAddress);
                         String[] split = discoverAddress.split(":");
 
