@@ -64,7 +64,7 @@ public class RpcClient {
 
         try {
             channel = bootstrap.connect(ip, port).sync().channel();
-            System.out.println("=====客户端连接成功！=====");
+            System.out.println("==rpc客户端连接成功！...");
         } catch (InterruptedException e) {
             e.printStackTrace();
             close();

@@ -28,7 +28,7 @@ public class ZkUtil1 {
 
     public static ZkClient connect() {
 
-        ZK_CLIENT = new ZkClient("127.0.0.1:2184");
+        ZK_CLIENT = new ZkClient("tx1:2181");
 
         System.out.println("zk连接建立");
 
@@ -36,8 +36,9 @@ public class ZkUtil1 {
         //判断是否存在
         boolean exists = ZK_CLIENT.exists(PARENT_PATH);
         if(!exists) {
+            System.out.println("根结点不存在，创建根结点: "+PARENT_PATH);
             //节点不存在，创建临时节点
-            ZK_CLIENT.createEphemeral(PARENT_PATH);
+            ZK_CLIENT.createPersistent(PARENT_PATH);
         }
 
         return ZK_CLIENT;
@@ -51,6 +52,7 @@ public class ZkUtil1 {
         path = PARENT_PATH + path;
 
         //创建临时节点
+
         ZK_CLIENT.createEphemeral(path);
         System.out.println("zk创建节点" + path);
         ZK_CLIENT.writeData(path, value);
@@ -71,6 +73,12 @@ public class ZkUtil1 {
                     });
                 }
                 //剔除下线的节点 非持久节点断开后会自动删除
+                CHILDREN_NODE_MAP.forEach((key, value) -> {
+                    if(currentChildrenMap.get(key) == null) {
+                        //这个节点不存在了,删除
+                        CHILDREN_NODE_MAP.put(key, null);
+                    }
+                });
             }
         });
 

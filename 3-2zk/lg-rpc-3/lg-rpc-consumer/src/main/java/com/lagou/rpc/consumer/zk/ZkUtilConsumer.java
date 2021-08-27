@@ -37,7 +37,7 @@ public class ZkUtilConsumer {
 
     public ZkClient connect() {
 
-        ZK_CLIENT = new ZkClient("127.0.0.1:2184");
+        ZK_CLIENT = new ZkClient("tx1:2181");
 
         System.out.println("============= zk连接建立 =============");
 
@@ -46,7 +46,7 @@ public class ZkUtilConsumer {
         boolean exists = ZK_CLIENT.exists(PARENT_PATH);
         if(!exists) {
             //节点不存在，创建临时节点
-            ZK_CLIENT.createEphemeral(PARENT_PATH);
+            ZK_CLIENT.createPersistent(PARENT_PATH);
         }
 
         //注册监听,监听子节点
@@ -98,6 +98,7 @@ public class ZkUtilConsumer {
                     //ip#port#time#dealTime
                     String ip = arr[0];
                     String port = arr[1];
+                    System.out.println("定时检测："+ ip + ":"+ port);
                     if(arr.length > 2) {
                         long preTime = Long.parseLong(arr[2]);
                         if(current - preTime > 5000) {
@@ -140,7 +141,7 @@ public class ZkUtilConsumer {
         return hostAndNodeMap;
     }
 
-    static Stat updateNodeVal(String nodePath, String value) {
+    public static Stat updateNodeVal(String nodePath, String value) {
         if(!ZK_CLIENT.exists(nodePath)) {
             //节点不存在，创建临时节点
             ZK_CLIENT.createEphemeral(nodePath);

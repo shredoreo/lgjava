@@ -1,4 +1,4 @@
-package com.lagou.rpc.consumer.connection
+package com.lagou.rpc.consumer.connection;
 
 import com.lagou.rpc.api.IUserService;
 import com.lagou.rpc.common.RpcResponse;
@@ -136,7 +136,7 @@ public class NettyConnection {
     /**
      * 新增连接
      */
-    static synchronized void addConnection(String host) {
+    public static synchronized void addConnection(String host) {
         String[] arr = host.split("#");
         //ip#port#time#dealTime
         String ip = arr[0];

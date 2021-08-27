@@ -1,5 +1,6 @@
 package com.lagou.rpc.api;
 
+import com.lagou.rpc.common.RpcResponse;
 import com.lagou.rpc.pojo.User;
 
 /**
@@ -14,4 +15,7 @@ public interface IUserService {
      * @return
      */
     User getById(int id);
+
+    RpcResponse sayHello(String s);
+
 }

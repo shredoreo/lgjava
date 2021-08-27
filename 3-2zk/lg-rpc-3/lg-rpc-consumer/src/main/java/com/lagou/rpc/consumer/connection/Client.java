@@ -1,5 +1,7 @@
 package com.lagou.rpc.consumer.connection;
 
+import com.lagou.rpc.common.RpcRequest;
+import com.lagou.rpc.common.RpcResponse;
 import com.lagou.rpc.consumer.handler.UserClientHandler;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelInitializer;
@@ -45,8 +47,8 @@ public class Client {
                         //获取ChannelPipeline
                         ChannelPipeline pipeline = socketChannel.pipeline();
                         //设置编码
-//                        pipeline.addLast(new RpcEncoder(RpcRequest.class, new JSONSerializer()));
-//                        pipeline.addLast(new RpcDecoder(RpcResponse.class, new JSONSerializer()));
+                        pipeline.addLast(new RpcEncoder(RpcRequest.class, new JSONSerializer()));
+                        pipeline.addLast(new RpcDecoder(RpcResponse.class, new JSONSerializer()));
 
                         //添加自定义事件处理器
                         pipeline.addLast(userClientHandler);

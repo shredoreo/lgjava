@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.core.env.SimpleCommandLinePropertySource;
 
 @SpringBootApplication
 public class ServerBootstrapApplication implements CommandLineRunner {
@@ -27,12 +28,19 @@ public class ServerBootstrapApplication implements CommandLineRunner {
      */
     @Override
     public void run(String... args) throws Exception {
+        SimpleCommandLinePropertySource cmd = new SimpleCommandLinePropertySource(args);
+        String ip = "127.0.0.1";
+        String port = cmd.getProperty("port");
+        if (port == null){
+            throw new RuntimeException("未传入端口");
+        }
 
+        System.out.println("cmd arg: ip= "+ip);
         new Thread(() ->
-                rpcServer.startServer("127.0.0.1", 8897))
+                rpcServer.startServer(ip, Integer.parseInt(port)))
                 .start();
 
-        new Thread(() ->
+       /* new Thread(() ->
                 rpcServer.startServer("127.0.0.1", 8898))
                 .start();
         new Thread(() ->
@@ -40,6 +48,6 @@ public class ServerBootstrapApplication implements CommandLineRunner {
                 .start();
 
         //服务注册
-        new Thread(registerServer).start();
+        new Thread(registerServer).start();*/
     }
 }

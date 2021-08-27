@@ -1,6 +1,7 @@
 package com.lagou.rpc.provider.service;
 
 import com.lagou.rpc.api.IUserService;
+import com.lagou.rpc.common.RpcResponse;
 import com.lagou.rpc.pojo.User;
 import com.lagou.rpc.provider.anno.RpcService;
 import org.springframework.stereotype.Service;
@@ -26,5 +27,10 @@ public class UserServiceImpl implements IUserService {
             userMap.put(user2.getId(), user2);
         }
         return userMap.get(id);
+    }
+
+    @Override
+    public RpcResponse sayHello(String s) {
+        return new RpcResponse();
     }
 }
