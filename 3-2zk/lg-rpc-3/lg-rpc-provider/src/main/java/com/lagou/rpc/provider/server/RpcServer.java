@@ -3,7 +3,6 @@ package com.lagou.rpc.provider.server;
 import com.lagou.rpc.provider.handler.RpcServerHandler;
 import com.lagou.rpc.provider.register.RegisterCenter;
 import com.lagou.rpc.provider.zk.ServerRegistry;
-import com.lagou.rpc.provider.zk.ZkUtil1;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -32,6 +31,7 @@ public class RpcServer implements DisposableBean {
     @Autowired
     ServerRegistry  serverRegistry;
 
+
     private NioEventLoopGroup bossGroup;
     private NioEventLoopGroup workerGroup;
 
@@ -58,7 +58,6 @@ public class RpcServer implements DisposableBean {
 
             ChannelFuture sync = serverBootstrap.bind(ip, port).sync();
 
-            String address = ip + ":" + port;
             //服务注册 serviceName -> ip:port
          /*   rpcServerHandler.SERVICE_INSTANCE_MAP.keySet().forEach(
                     k -> {
@@ -68,11 +67,13 @@ public class RpcServer implements DisposableBean {
             // 服务注册 直接注册当前服务的地址
             serverRegistry.register(ip +":"+port);*/
 
-            String data = ip + "#" + port;
+            String hostAddr = ip + "#" + port;
+            String data = "0";
 
             //注册服务
-            new ZkUtil1().createNode("/"+data, data);
+            serverRegistry.register(hostAddr);
 
+//            new ZkUtil1().createNode("/"+hostAddr, data);
             System.out.println("=====服务端启动成功=====");
             //监听服务端关闭
             sync.channel().closeFuture().sync();

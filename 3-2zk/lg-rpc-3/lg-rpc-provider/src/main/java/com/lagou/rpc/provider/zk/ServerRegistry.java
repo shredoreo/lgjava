@@ -1,5 +1,6 @@
 package com.lagou.rpc.provider.zk;
 
+import com.lagou.rpc.constant.Const;
 import org.I0Itec.zkclient.ZkClient;
 import org.apache.zookeeper.KeeperException;
 import org.apache.zookeeper.WatchedEvent;
@@ -7,6 +8,7 @@ import org.apache.zookeeper.Watcher;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import java.io.IOException;
 
 @Component
@@ -16,7 +18,22 @@ public class ServerRegistry implements Watcher {
     String ip;
 
     @Value("${zk.port}")
-    String  port;
+    int  port;
+
+    ZkClient zkClient;
+
+
+    @PostConstruct
+    private void connect(){
+        zkClient = new ZkClient(ip+":"+ port);
+        System.out.println("zk连接建立..");
+        if (!zkClient.exists(Const.NODE_PARENT)){
+            System.out.println("创建服务端根结点");
+            zkClient.createPersistent(Const.NODE_PARENT);
+        }
+
+
+    }
 
 
     /**
@@ -24,20 +41,20 @@ public class ServerRegistry implements Watcher {
      * @param address host:port
      */
     public void register(String address) throws IOException, KeeperException, InterruptedException {
-        String connectString = ip + ":" + port;
-       /* ZooKeeper zooKeeper = new ZooKeeper(connectString, 5000, new ServerRegistry());
-        //创建服务端对应端的临时节点
-        String tmpNode = zooKeeper.create(address,
-                ("节点内容" + address).getBytes(StandardCharsets.UTF_8),
-                ZooDefs.Ids.OPEN_ACL_UNSAFE,
-                CreateMode.EPHEMERAL
-        );
-                System.out.println("节点被创建: " + tmpNode);
 
-*/
-        ZkClient zkClient = new ZkClient(connectString);
-        zkClient.createEphemeral("/rpc/"+ address);
+        createNode(address, "0");
 
+    }
+
+    public void createNode(String path, Object value) {
+        path = Const.NODE_PARENT + "/"+ path;
+
+        //创建临时节点
+
+        zkClient.createEphemeral(path);
+        System.out.println("zk创建节点" + path);
+        zkClient.writeData(path, value);
+        System.out.println("节点" + path + " 写入值 " + value);
     }
 
     @Override

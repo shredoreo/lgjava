@@ -1,4 +1,4 @@
-package com.lagou.rpc.consumer.discover;
+package com.lagou.rpc.consumer.connection;
 
 import com.lagou.rpc.constant.Const;
 import com.lagou.rpc.consumer.RpcClient;
@@ -8,6 +8,9 @@ import java.util.HashMap;
 @Component
 public class NettyRpcConnection {
 
+    /**
+     * 建立连接的rpc客户端
+     */
     HashMap<String, RpcClient> hostClientMap = new HashMap<>();
 
     public HashMap<String, RpcClient> getHostClientMap() {
