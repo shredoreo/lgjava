@@ -12,6 +12,7 @@
         <module>dubbo-spi-api</module>
         <module>dubbo-spi-impl</module>
         <module>dubbo-spi-demo-main</module>
+        <module>dubbo-spi-router</module>
     </modules>
 
     <properties>

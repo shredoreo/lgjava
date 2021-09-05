@@ -14,7 +14,7 @@ public class DubboSpiMain {
         // 便利所有支持的扩展点
         Set<String> extensions = extensionLoader.getSupportedExtensions();
 
-        System.out.println(extensions);
+        System.out.println(extensions);//[dog, human]
 
         for (String extension : extensions) {
             String s = extensionLoader.getExtension(extension).sayHello();
