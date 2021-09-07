@@ -1,0 +1,19 @@
+#eureka server
+server:
+  port: 8761
+spring:
+  application:
+    name: sc-erueka-server #应用名称，会在eureka中作为服务名称
+
+    # eureka 客户端配置（和server交互），Eureka Server 其实也是一个Client
+eureka:
+  instance:
+    hostname: EurekaServerA # 当前Eureka实例的主机名
+  client:
+    # Eureka server 集群中每一个server相对于其他server都是client
+    service-url: # 配置客户端锁交互的Eureka Server 的地址
+      # 集群模式下，defaultZone应指向其他Eureka server，若有更多其他实例，使用逗号分隔
+      defaultZone: http://${eureka.instance.hostname}:${server.port}/eureka
+    register-with-eureka: false # 当前自己就是server，不需要注册自己
+    fetch-registry: false # 查询获取注册中心的服务信息，自己就是Server，不需要，默认时true，此处置为false
+
