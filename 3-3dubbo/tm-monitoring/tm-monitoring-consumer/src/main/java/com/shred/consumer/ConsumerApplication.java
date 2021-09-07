@@ -17,6 +17,7 @@ public class ConsumerApplication {
         context.start();
         DemoServiceComp serviceProxy = context.getBean("demoServiceComponent",DemoServiceComp.class);
 
+        System.out.println("212");
         ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(100, 100, 0L, TimeUnit.SECONDS, new ArrayBlockingQueue<>(50));
         long startTime = System.currentTimeMillis();
         int minutes = 3;
@@ -24,7 +25,7 @@ public class ConsumerApplication {
         while (true) {
             try {
                 // 这里适当的休息一会，否则线程池不够用，会拒绝服务
-                Thread.sleep(5);
+                Thread.sleep(100);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

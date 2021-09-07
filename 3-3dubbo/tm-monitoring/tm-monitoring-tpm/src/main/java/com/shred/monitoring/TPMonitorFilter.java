@@ -10,6 +10,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @Activate(group = {CommonConstants.CONSUMER})
 public class TPMonitorFilter implements Filter, Runnable {
@@ -19,9 +20,11 @@ public class TPMonitorFilter implements Filter, Runnable {
     Map<String, List<MethodInfo>> methodTimes = new ConcurrentHashMap<>();
 
     public TPMonitorFilter() {
+        System.out.println("创建定时任务");
+        //创建定时任务
         // 创建定时线程，每隔5s打印一次最近1分钟内每个方法的TP90、TP99的耗时情况
         Executors.newSingleThreadScheduledExecutor()
-                .scheduleWithFixedDelay(this, 5, 5, TimeUnit.SECONDS);
+                .scheduleWithFixedDelay(this, 5,5, TimeUnit.SECONDS);
     }
 
 
@@ -30,6 +33,7 @@ public class TPMonitorFilter implements Filter, Runnable {
         Date date = new Date();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
         String dateStr = sdf.format(date);
+        System.out.println("=================线程使用情况=================");
         /**
          * 线程使用情况
          */
@@ -37,6 +41,7 @@ public class TPMonitorFilter implements Filter, Runnable {
             System.out.println(dateStr + methodInfos.getKey() + "的TP90:" + getTP(methodInfos.getValue(), 0.9) + "毫秒,"
                     + "TP99:" + getTP(methodInfos.getValue(), 0.99) + "毫秒");
         }
+        System.out.println("=======================================");
     }
 
 
@@ -50,28 +55,23 @@ public class TPMonitorFilter implements Filter, Runnable {
      * @return
      */
     private long getTP(List<MethodInfo> methodInfos, double rate) {
-        // 构建一个临时集合保存 用于满足1一分钟之内的数据
-        List<MethodInfo> sortInfo = new ArrayList<>();
+
         // 计算最近一分钟的TP90 和 TP99
         long endTime = System.currentTimeMillis();
         long startTime = System.currentTimeMillis() - 60000;
 
-        // 遍历列表集合
-        int length = methodInfos.size();
-        for (MethodInfo methodInfo : methodInfos) {
-            if (methodInfo.getEndTimes() >= startTime && methodInfo.getEndTimes() <= endTime) {
-                //将满足条件的方法信息存储到临时集合中
-                sortInfo.add(methodInfo);
-            }
-        }
-
-        //对满足1一分钟之内的数据进行排序
-        sortInfo.sort(Comparator.comparingLong(MethodInfo::getTimes));
+        List<MethodInfo> collect = methodInfos.stream()
+                //过滤出近一分钟内的
+                .filter(methodInfo ->
+                        methodInfo.getEndTimes() >= startTime && methodInfo.getEndTimes() <= endTime)
+                //排序
+                .sorted(Comparator.comparingLong(MethodInfo::getTimes))
+                .collect(Collectors.toList());
 
         //获取当前排序后集合中的指定百分比数值的位置，此位置存储的数据就是当前计算的tp90/99
-        int index = (int) (sortInfo.size() * rate);
+        int index = (int) (collect.size() * rate);
 
-        return sortInfo.get(index).getTimes();
+        return collect.get(index).getTimes();
     }
 
     @Override
@@ -82,6 +82,7 @@ public class TPMonitorFilter implements Filter, Runnable {
         long costTime = System.currentTimeMillis() - l;
         String methodName = invocation.getMethodName();
         System.out.printf("%s 耗时：%s 毫秒%n", methodName, costTime);
+
         methodTimes.computeIfAbsent(methodName, k -> new ArrayList<>())
                 .add(
                         new MethodInfo(invocation.getMethodName(), costTime, System.currentTimeMillis())

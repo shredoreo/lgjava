@@ -102,6 +102,11 @@
         </dependency>
         <!--引入Jaxb，结束-->
 
+        <!--spring-cloud-commons-->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-commons</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
