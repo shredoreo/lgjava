@@ -1,6 +1,11 @@
 package com.shred.juc.demo;
 
 public class MyThread extends Thread{
+
+    public synchronized void method(){
+        //临界段
+    }
+
     @Override
     public void run() {
 
