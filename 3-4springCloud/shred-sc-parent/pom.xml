@@ -9,10 +9,14 @@
     <version>1.0-SNAPSHOT</version>
     <modules>
         <module>sc-common</module>
-        <module>sc-autodeliver</module>
-        <module>sc-resume</module>
+        <module>sc-autodeliver-8090</module>
+        <module>sc-autodeliver-8091</module>
+        <module>sc-resume-8080</module>
+        <module>sc-resume-8081</module>
         <module>sc-erueka-server-8761</module>
         <module>sc-erueka-server-8762</module>
+        <module>sc-hystrix-dashboard-9000</module>
+        <module>sc-hystrix-turbine-9001</module>
     </modules>
 
     <properties>
