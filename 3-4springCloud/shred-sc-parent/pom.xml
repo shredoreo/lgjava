@@ -17,6 +17,7 @@
         <module>sc-erueka-server-8762</module>
         <module>sc-hystrix-dashboard-9000</module>
         <module>sc-hystrix-turbine-9001</module>
+        <module>sc-autodeliver-8096</module>
     </modules>
 
     <properties>
