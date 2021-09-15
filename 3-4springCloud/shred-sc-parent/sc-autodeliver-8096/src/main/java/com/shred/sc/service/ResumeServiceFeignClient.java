@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
  */
 //@FeignClient表明当前类是Feign客户端
 // value指定该客户端要请求的服务名称，（登记到注册中心上，服务提供者的服务名）
-@FeignClient(value = "sc-resume")
-@RequestMapping("/resume")
+@FeignClient(value = "sc-resume",fallback = ResumeFallback.class,path = "/resume")
+//@RequestMapping("/resume")//使用fallback之后，该路径需写在FeignClient中
 public interface ResumeServiceFeignClient {
 
     @GetMapping("/openstate/{userId}")
