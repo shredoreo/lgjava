@@ -5,21 +5,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.shred.sc</groupId>
-    <artifactId>shred-sc-parent</artifactId>
+    <artifactId>sc-gateway-9002</artifactId>
     <version>1.0-SNAPSHOT</version>
-    <modules>
-        <module>sc-common</module>
-        <module>sc-autodeliver-8090</module>
-        <module>sc-autodeliver-8091</module>
-        <module>sc-resume-8080</module>
-        <module>sc-resume-8081</module>
-        <module>sc-erueka-server-8761</module>
-        <module>sc-erueka-server-8762</module>
-        <module>sc-hystrix-dashboard-9000</module>
-        <module>sc-hystrix-turbine-9001</module>
-        <module>sc-autodeliver-8096</module>
-        <module>sc-config-9006</module>
-    </modules>
 
     <properties>
         <maven.compiler.source>11</maven.compiler.source>
@@ -31,25 +18,25 @@
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>2.1.6.RELEASE</version>
     </parent>
-    <!--父工程打包方式为pom-->
-    <packaging>pom</packaging>
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.springframework.cloud</groupId>
-                <artifactId>spring-cloud-dependencies</artifactId>
-                <version>Greenwich.RELEASE</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
-    <dependencies>
 
-        <!--web依赖-->
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-commons</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+        </dependency>
+        <!--GateWay 网关-->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-gateway</artifactId>
+        </dependency>
+        <!--引入webflux-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
+            <artifactId>spring-boot-starter-webflux</artifactId>
         </dependency>
         <!--日志依赖-->
         <dependency>
@@ -69,19 +56,8 @@
             <version>1.18.4</version>
             <scope>provided</scope>
         </dependency>
-        <!-- Actuator可以帮助你监控和管理Spring Boot应用-->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-actuator</artifactId>
-        </dependency>
-        <!--热部署-->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-devtools</artifactId>
-            <optional>true</optional>
-        </dependency>
 
-        <!--eureka server 需要引入Jaxb，开始-->
+        <!--引入Jaxb，开始-->
         <dependency>
             <groupId>com.sun.xml.bind</groupId>
             <artifactId>jaxb-core</artifactId>
@@ -108,12 +84,37 @@
         </dependency>
         <!--引入Jaxb，结束-->
 
-        <!--spring-cloud-commons-->
+        <!-- Actuator可以帮助你监控和管理Spring Boot应用-->
         <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-commons</artifactId>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
+        <!--热部署-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-devtools</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <!--链路追踪-->
+        <!--<dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-sleuth</artifactId>
+        </dependency>-->
     </dependencies>
+
+    <dependencyManagement>
+        <!--spring cloud依赖版本管理-->
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>Greenwich.RELEASE</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <build>
         <plugins>
@@ -134,4 +135,5 @@
             </plugin>
         </plugins>
     </build>
+
 </project>

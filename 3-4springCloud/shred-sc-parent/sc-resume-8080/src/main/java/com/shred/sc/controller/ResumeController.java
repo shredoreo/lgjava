@@ -22,11 +22,11 @@ public class ResumeController {
     @GetMapping("/openstate/{userId}")
     public Integer findDefaultResumeState(@PathVariable Long userId){
         // 模拟超时
-        try {
+       /* try {
             Thread.sleep(10000);
         } catch (InterruptedException e) {
             e.printStackTrace();
-        }
+        }*/
 
 //        return resumeService.findDefaultByUserId(userId).getIsOpenResume();
         System.out.println(port);

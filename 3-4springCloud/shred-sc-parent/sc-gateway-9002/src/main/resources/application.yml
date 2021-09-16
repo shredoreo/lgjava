@@ -1,0 +1,28 @@
+server:
+  port: 9002
+eureka:
+  client:
+    service-url:
+      defaultZone: http://EurekaServerA:8761/eureka,http://EurekaServerB:8762/eureka
+  instance:
+    prefer-ip-address: true
+    instance-id: ${spring.cloud.client.ip-address}:${spring.application.name}:${server.port}:@project.version@
+
+spring:
+  application:
+    name: sc-gateway
+  cloud:
+    gateway:
+      routes:
+        - id: service-autodeliver-router # 我们自定义的路由 ID，保持唯一
+#          uri: http://127.0.0.1:8090
+          uri: lb://SC-AUTODELIVER
+          predicates:
+            - Path=/autodeliver/**
+        - id: service-resume-router
+#          uri: http://127.0.0.1:8080
+          uri: lb://sc-resume
+          predicates:
+            - Path=/resume/**
+          filters:
+            - StripPrefix=1 # 将path中的第一个路径去掉，即去掉resume
