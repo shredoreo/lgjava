@@ -1,0 +1,32 @@
+server:
+  port: 9092
+spring:
+  application:
+    name: sc-stream-consumer
+  cloud:
+    stream:
+      binders: # 绑定MQ服务信息（此处我们是RabbitMQ）
+        scRabbitBinder: # 给Binder定义的名称，用于后面的关联
+          type: rabbit # MQ类型，如果是Kafka的话，此处配置kafka
+          environment: # MQ环境配置（用户名、密码等）
+            spring:
+              rabbitmq:
+                host: localhost
+                port: 5672
+                username: guest
+                password: guest
+      bindings: # 关联整合通道和binder对象
+        input: # output是我们定义的通道名称，此处不能乱改
+          destination: shredExchange # 要使用的Exchange名称（消息队列主题名称）
+          content-type: text/plain # application/json # 消息类型设置，比如json
+          binder: scRabbitBinder # 关联MQ服务, 上面 binders 下 定义的名称
+          group: shred001
+
+eureka:
+  client:
+    service-url:
+      #注册到集群
+      defaultZone: http://EurekaServerA:8761/eureka,http://EurekaServerB:8762/eureka
+  instance:
+    #使用ip注册，否则会使用主机名注册了(此处考虑到对老版本的兼容，新版本经过实验都是ip)
+    prefer-ip-address: true

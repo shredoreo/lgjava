@@ -36,3 +36,8 @@ spring:
           username: shreddd
           password: microl720
       label: master #读取分支
+  rabbitmq:
+    host: 127.0.0.1
+    port: 5672
+    username: guest
+    password: guest

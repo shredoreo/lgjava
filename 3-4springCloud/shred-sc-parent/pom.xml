@@ -19,6 +19,8 @@
         <module>sc-hystrix-turbine-9001</module>
         <module>sc-autodeliver-8096</module>
         <module>sc-config-9006</module>
+        <module>sc-stream-producer</module>
+        <module>sc-stream-consumer-9091</module>
     </modules>
 
     <properties>

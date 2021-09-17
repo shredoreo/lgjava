@@ -1,5 +1,5 @@
 server:
-  port: 8081
+  port: 8080
 spring:
   application:
     name: sc-resume
@@ -13,12 +13,15 @@ spring:
     show-sql: true
     hibernate:
       naming:
-        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl #避免将驼峰命名转换为下划线命名
-  rabbitmq:
-    host: 127.0.0.1
-    port: 5672
-    username: guest
-    password: guest
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl  #避免将驼峰命名转换为下划线命名
+  cloud:
+    #分布式客户端配置
+    config:
+      name: sc-resume #配置文件名
+      profile: dev #后缀
+      label: master #分支
+      uri: http://localhost:9006 #config配置中心地址
+
 
 management:
   endpoints:
