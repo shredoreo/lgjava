@@ -1,0 +1,5 @@
+spring:
+  mail:
+    password: huxyrbcieicebibd
+  application:
+    name: shred-email
