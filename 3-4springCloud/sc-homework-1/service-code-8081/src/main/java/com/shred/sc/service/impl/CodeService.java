@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.Optional;
+import java.util.Random;
 import java.util.UUID;
 
 @Service
@@ -35,7 +36,7 @@ public class CodeService implements ICodeService {
 
 
 //        authCode2.setEmail(email);
-        authCode2.setCode(UUID.randomUUID().toString());
+        authCode2.setCode(""+(int)((Math.random()*9+1)*100000));
         authCode2.setCreateTime(new Date());
         authCode2.setExpireTime(
                 Date.from(
@@ -44,6 +45,7 @@ public class CodeService implements ICodeService {
                 )
         );
 
+        System.out.println("保存验证码");
         authCodeDao.save(authCode2);
 
         return authCode2;

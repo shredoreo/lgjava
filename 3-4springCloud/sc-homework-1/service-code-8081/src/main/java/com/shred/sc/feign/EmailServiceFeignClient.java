@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-@FeignClient(value = "shred-email")
+@FeignClient(value = "service-email")
 @RequestMapping("/email")
 public interface EmailServiceFeignClient {
     @GetMapping("/{email}/{code}")

@@ -1,15 +1,20 @@
 server:
-  port: 8082
+  port: 8081
 spring:
   application:
-    name: service-email
+    name: service-code
   rabbitmq:
     host: 127.0.0.1
     port: 5672
     username: guest
     password: guest
-  mail:
-    password: huxyrbcieicebibd
+  jpa:
+    database: MySQL
+    show-sql: true
+    hibernate:
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl #避免将驼峰命名转换为下划线命名
+
 
 management:
   endpoints:
@@ -28,5 +33,3 @@ eureka:
     lease-renewal-interval-in-seconds: 30
     # 租约到期，服务时效时间，默认值90秒,服务超过90秒没有发生心跳，EurekaServer会将服务从列表移除
     lease-expiration-duration-in-seconds: 90
-
-

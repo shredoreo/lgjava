@@ -1,0 +1,8 @@
+spring:
+  cloud:
+    #分布式客户端配置
+    config:
+      name: shred-config #配置文件名
+      profile: dev #后缀
+      label: master #分支
+      uri: http://localhost:9006 #config配置中心地址

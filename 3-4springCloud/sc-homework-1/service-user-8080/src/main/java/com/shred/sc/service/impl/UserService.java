@@ -14,7 +14,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Service
-@Slf4j
+@Slf4j(topic = "用户服务")
 public class UserService implements IUserService {
     @Autowired
     private TokenDao tokenDao;
@@ -22,12 +22,8 @@ public class UserService implements IUserService {
     private CodeServiceFeignClient codeFeign;
 
     @Override
-    public boolean register(String email, String password, String code) {
-        //校验注册
-        if (isRegisterd(email)) {
-            log.info("已注册");
-            return false;
-        }
+    public int register(String email, String password, String code) {
+
         //校验验证码
         Integer validateRes = codeFeign.verifyCode(email, code);
 
@@ -36,11 +32,21 @@ public class UserService implements IUserService {
         token.setEmail(email);
 
         if (validateRes.compareTo(0) == 0) {
+            //校验注册
+            if (isRegisterd(email)) {
+                log.info("用户存在，已注册");
+                return 3;
+            }
+            log.warn("注册时保存用户");
             //保存用户
             tokenDao.save(token);
-            return true;
+            return 0;
+        } else if (validateRes ==2){
+            log.warn("验证码超时");
+            return 2;
         } else {
-            return false;
+            log.warn("验证码错误");
+            return 1;
         }
     }
 
@@ -57,8 +63,22 @@ public class UserService implements IUserService {
         Token token = new Token();
         token.setToken(TokenUtil.geneToken(email, password));
         token.setEmail(email);
+        log.warn(token.toString());
+
         Optional<Token> one = tokenDao.findOne(Example.of(token));
+
         return one.get().getEmail();
+    }
+
+    @Override
+    public Token findToken(String email, String password) {
+        Token token = new Token();
+        token.setToken(TokenUtil.geneToken(email, password));
+        token.setEmail(email);
+        Optional<Token> one = tokenDao.findOne(Example.of(token));
+
+
+        return one.get();
     }
 
     @Override
