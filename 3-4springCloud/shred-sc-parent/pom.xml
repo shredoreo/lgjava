@@ -22,6 +22,7 @@
         <module>sc-stream-producer-9090</module>
         <module>sc-stream-consumer-9091</module>
         <module>sc-zipkin-server-9411</module>
+        <module>sc-oauth-server-9999</module>
     </modules>
 
     <properties>
