@@ -44,7 +44,7 @@ public class BlackListFilter implements GlobalFilter, Order {
 
         String clientIp = request.getRemoteAddress().getHostString();
 
-        if (blackList.contains(clientIp)){
+      /*  if (blackList.contains(clientIp)){
             response.setStatusCode(HttpStatus.UNAUTHORIZED);
             log.debug("===>IP:"+ clientIp+" 在黑名单总，将被拒绝访问");
 
@@ -52,7 +52,7 @@ public class BlackListFilter implements GlobalFilter, Order {
             DataBuffer dataBuffer = response.bufferFactory().wrap(s.getBytes(StandardCharsets.UTF_8));
 
             return response.writeWith(Mono.just(dataBuffer));
-        }
+        }*/
 
         return chain.filter(exchange);
     }

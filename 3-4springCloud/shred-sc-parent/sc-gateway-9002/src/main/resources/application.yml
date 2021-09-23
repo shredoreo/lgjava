@@ -30,6 +30,10 @@ spring:
   cloud:
     gateway:
       routes:
+        - id: service-oauth2-router # 我们自定义的路由 ID，保持唯一
+          uri: lb://SC-OAUTH2
+          predicates:
+            - Path=/oauth/**
         - id: service-autodeliver-router # 我们自定义的路由 ID，保持唯一
 #          uri: http://127.0.0.1:8090
           uri: lb://SC-AUTODELIVER

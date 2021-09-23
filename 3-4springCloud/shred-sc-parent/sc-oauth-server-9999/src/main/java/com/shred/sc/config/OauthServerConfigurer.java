@@ -1,6 +1,7 @@
 package com.shred.sc.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -10,12 +11,15 @@ import org.springframework.security.oauth2.config.annotation.web.configuration.A
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerEndpointsConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerSecurityConfigurer;
+import org.springframework.security.oauth2.provider.client.JdbcClientDetailsService;
 import org.springframework.security.oauth2.provider.token.AuthorizationServerTokenServices;
 import org.springframework.security.oauth2.provider.token.DefaultTokenServices;
 import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.oauth2.provider.token.store.InMemoryTokenStore;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
+
+import javax.sql.DataSource;
 
 /**
  * 当前配置类需要继承特定的父类 AuthorizationServerConfigurerAdapter
@@ -68,8 +72,19 @@ public class OauthServerConfigurer extends AuthorizationServerConfigurerAdapter 
                 .authorizedGrantTypes("password", "refresh_token")
                 // 客户端的权限范围，此处配置为all全部即可
                 .scopes("all");
-
+// 从内存中加载客户端详情改为从数据库中加载客户端详情
+        clients.withClientDetails(createJdbcClientDetailsService());
     }
+
+    @Autowired
+    private DataSource dataSource;
+
+    @Bean
+    public JdbcClientDetailsService createJdbcClientDetailsService(){
+        JdbcClientDetailsService jdbcClientDetailsService = new JdbcClientDetailsService(dataSource);
+        return jdbcClientDetailsService;
+    }
+
 
     /**
      * 和 token 管理相关
@@ -119,6 +134,9 @@ public class OauthServerConfigurer extends AuthorizationServerConfigurerAdapter 
 
     private String sign_key = "shred123";
 
+    @Autowired
+    private ShredAccessTokenConverter shredAccessTokenConverter;
+
     /**
      * 返回令牌转换器
      * @return
@@ -130,6 +148,8 @@ public class OauthServerConfigurer extends AuthorizationServerConfigurerAdapter 
 
         //验证时使用的密钥，和签名密钥保持一致
         converter.setVerifier(new MacSigner(sign_key));
+        //设置自定义的转换器
+        converter.setAccessTokenConverter(shredAccessTokenConverter);
 
         return converter;
     }

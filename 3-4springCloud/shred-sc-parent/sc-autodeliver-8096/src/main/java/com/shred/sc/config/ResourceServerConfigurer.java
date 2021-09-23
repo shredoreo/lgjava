@@ -1,5 +1,6 @@
 package com.shred.sc.config;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -86,6 +87,9 @@ public class ResourceServerConfigurer extends ResourceServerConfigurerAdapter {
     }
 
 
+    @Autowired
+    private ShredAccessTokenConverter shredAccessTokenConverter;
+
     /**
      * 返回令牌转换器
      * @return
@@ -97,6 +101,7 @@ public class ResourceServerConfigurer extends ResourceServerConfigurerAdapter {
 
         //验证时使用的密钥，和签名密钥保持一致
         converter.setVerifier(new MacSigner(sign_key));
+        converter.setAccessTokenConverter(shredAccessTokenConverter);
 
         return converter;
     }
