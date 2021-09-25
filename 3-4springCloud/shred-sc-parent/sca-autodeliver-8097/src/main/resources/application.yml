@@ -1,34 +1,16 @@
 server:
-  port: 8096
+  port: 8097
 
-oauth2:
-  server:
-    check-token-url: http://localhost:9999/oauth/check_token
-
-eureka:
-  client:
-    service-url:
-      #注册到集群
-      defaultZone: http://EurekaServerA:8761/eureka,http://EurekaServerB:8762/eureka
-  instance:
-    #使用ip注册，否则会使用主机名注册了(此处考虑到对老版本的兼容，新版本经过实验都是ip)
-    prefer-ip-address: true
-    #自定义实例显示格式，加上版本号，便于多版本管理，注意是ip-address，早期版本是ipAddress
-    instance-id: ${spring.cloud.client.ip-address}:${spring.application.name}:${server.port}:@project.version@
 spring:
   application:
     name: sc-autodeliver
-  zipkin:
-    base-url: http://127.0.0.1:9411 # zipkin server的请求地址
-    sender:
-      # web 客户端将踪迹日志数据通过网络请求的方式传送到服务端，另外还有配 置
-      # kafka/rabbit 客户端将踪迹日志数据传递到mq进行中转
-      type: web
-  sleuth:
-    sampler:
-      # 采样率 1 代表100%全部采集 ，默认0.1 代表10% 的请求踪迹数据会被采集
-      # 生产环境下，请求量非常大，没有必要所有请求的踪迹数据都采集分析，对于网络包括server端压力都是比较大的，可以配置采样率采集一定比例的请求的踪迹 数据进行分析即可
-      probability: 1
+  cloud:
+    nacos:
+      discovery:
+        # 集群中各个节点信息都配置在此（域名- virtual IP -绑定映射到各个实例的地址信息）
+        server-addr: 127.0.0.1:8848,127.0.0.1:8849,127.0.0.1:8850
+
+
 SC-RESUME:
   ribbon:
     #请求连接超时时间
@@ -59,15 +41,10 @@ feign:
     response:
       enabled: true # 开启响应压缩
 
-
-
 logging:
   level:
     # 设置Feign日志只会对日志级别为debug的做出响应
     com.shred.sc.service.ResumeServiceFeignClient: debug
-    org.springframework.web.servlet.DispatcherServlet: debug
-    org.springframework.cloud.sleuth: debug
-
 
 # springboot中暴露健康检查等断点接口
 management:

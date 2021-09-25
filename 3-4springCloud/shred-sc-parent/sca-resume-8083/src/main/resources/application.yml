@@ -1,0 +1,30 @@
+server:
+  port: 8083
+spring:
+  application:
+    name: sc-resume
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/spring_cloud?useUnicode=true&characterEncoding=utf8
+    username: root
+    password: root
+  jpa:
+    database: MySQL
+    show-sql: true
+    hibernate:
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl #避免将驼峰命名转换为下划线命名
+  cloud:
+    nacos:
+      discovery:
+        # 集群中各个节点信息都配置在此（域名- virtual IP -绑定映射到各个实例的地址信息）
+        server-addr: 127.0.0.1:8848,127.0.0.1:8849,127.0.0.1:8850
+        cluster-name: SZ # 配置所在的集群，默认是default
+        namespace: dev #命令空间，按环境隔离
+
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
