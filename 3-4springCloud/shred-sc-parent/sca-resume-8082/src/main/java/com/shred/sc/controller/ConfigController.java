@@ -11,11 +11,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RefreshScope
 public class ConfigController {
 
-    @Value("${shred.message}")
+//    @Value("${shred.message}")
     private String world;
-    @Value("${abc.test}")
+//    @Value("${abc.test}")
     private String abc;
-    @Value("${def.test}")
+//    @Value("${def.test}")
     private String def;
 
     @GetMapping("/view")

@@ -27,6 +27,7 @@
         <module>sca-resume-8083</module>
 
         <module>sca-autodeliver-8097</module>
+        <module>sca-autodeliver-8098-sentinel</module>
     </modules>
 
     <properties>
