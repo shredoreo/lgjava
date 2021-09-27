@@ -13,7 +13,23 @@ spring:
       transport:
         dashboard: 127.0.0.1:8080 # sentinel dashboard/console
         port: 8719 # sentinel 会在该端口启动http server 控制台定义的的限流等规则才能发送传递过来
-
+      # Sentinel Nacos数据源配置，Nacos中的规则会自动同步到sentinel控 制台的流控规则中
+      datasource:
+        # 此处的flow为自定义数据源名
+        flow: # 流控规则
+          nacos:
+            server-addr: ${spring.cloud.nacos.discovery.server-addr}
+            data-id: ${spring.application.name}-flow-rules
+            groupId: DEFAULT_GROUP
+            data-type: json
+            rule-type: flow # 类型来自RuleType类
+        degrade:
+          nacos:
+            server-addr: ${spring.cloud.nacos.discovery.server-addr}
+            data-id: ${spring.application.name}-degrade-rules
+            groupId: DEFAULT_GROUP
+            data-type: json
+            rule-type: degrade # 类型来自RuleType类
 
 
 SC-RESUME:
