@@ -1,0 +1,45 @@
+server:
+  port: 8084
+spring:
+  application:
+    name: sc-resume
+  main:
+    #spring boot 2.1 整合dubbo时，需要设定
+    allow-bean-definition-overriding: true
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/spring_cloud?useUnicode=true&characterEncoding=utf8
+    username: root
+    password: root
+  jpa:
+    database: MySQL
+    show-sql: true
+    hibernate:
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl #避免将驼峰命名转换为下划线命名
+  cloud:
+    nacos:
+      discovery:
+        # 集群中各个节点信息都配置在此（域名- virtual IP -绑定映射到各个实例的地址信息）
+        server-addr: 127.0.0.1:8848,127.0.0.1:8849,127.0.0.1:8850
+        cluster-name: SZ # 配置所在的集群，默认是default
+        namespace: public #命令空间，按环境隔离
+
+dubbo:
+  scan:
+    # dubbo 服务扫描基准包
+    base-packages: com.shred.sc.service.impl
+  protocol:
+    # dubbo 协议
+    name: dubbo
+    # dubbo 协议端口( -1 表示自增端口，从 20880 开始)
+    port: -1
+  registry:
+    # 挂载到 Spring Cloud 的注册中心 ,也就是nacos的注册中心
+    address: spring-cloud://localhost
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
