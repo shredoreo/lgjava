@@ -1,0 +1,50 @@
+server:
+  port: 9002
+eureka:
+  client:
+    service-url:
+      defaultZone: http://EurekaServerA:8761/eureka,http://EurekaServerB:8762/eureka
+  instance:
+    prefer-ip-address: true
+    instance-id: ${spring.cloud.client.ip-address}:${spring.application.name}:${server.port}:@project.version@
+#ip:
+#  period: 3
+#  limit: 5
+#  uri: /user/register
+
+spring:
+  application:
+    name: shred-gateway
+  cloud:
+    gateway:
+      routes:
+        - id: service-user-router # 自定义的路由 ID，保持唯一
+          uri: http://127.0.0.1:8080
+          predicates:
+            - Path=/api/user/**
+          filters:
+            - StripPrefix=1
+            - IpFlush=register #自定义的局部过滤器，传入参数会设置到config上
+        - id: service-code-router
+          uri: http://127.0.0.1:8081
+          predicates:
+            - Path=/api/code/**
+          filters:
+            - StripPrefix=1
+        - id: service-email-router
+          uri: http://127.0.0.1:8082
+          predicates:
+            - Path=/api/email/**
+  rabbitmq:
+    host: 127.0.0.1
+    port: 5672
+    username: guest
+    password: guest
+
+
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: refresh

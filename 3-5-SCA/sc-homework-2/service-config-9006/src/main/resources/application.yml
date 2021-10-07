@@ -1,0 +1,43 @@
+server:
+  port: 9006
+
+spring:
+  application:
+    name: shred-config
+  cloud:
+    # 分布式配置
+    config:
+      server:
+        git:
+          uri: https://gitee.com/shreddd/shred-homework-config.git
+          search-paths:
+            - shred-homework-config
+          username: shreddd
+          # password: ######
+      label: master #读取分支
+  # config bus 使用的消息中间件
+  rabbitmq:
+    host: 127.0.0.1
+    port: 5672
+    username: guest
+    password: guest
+
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://EurekaServerA:8761/eureka,http://EurekaServerB:8762/eureka
+  instance:
+    prefer-ip-address: true
+    instance-id: ${spring.cloud.client.ip-address}:${spring.application.name}:${server.port}:@project.version@
+
+# springboot中暴露健康检查等断点接口
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+    # 暴露健康接口的细节
+  endpoint:
+    health:
+      show-details: always

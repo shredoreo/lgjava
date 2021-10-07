@@ -1,0 +1,50 @@
+server:
+  port: 8080
+spring:
+  application:
+    name: service-user
+  main:
+    #spring boot 2.1 整合dubbo时，需要设定
+    allow-bean-definition-overriding: true
+  cloud:
+    nacos:
+      discovery:
+        # 集群中各个节点信息都配置在此（域名- virtual IP -绑定映射到各个实例的地址信息）
+        server-addr: 127.0.0.1:8848
+      config:
+        server-addr: 127.0.0.1:8848
+        # 指定server端端配置文件，读取配置项
+        namespace: a82968e2-9252-460a-8995-29cba0cd95f2
+        group: DEFAULT_GROUP #默认分组是DEFAULT_GROUP，可不配置
+        file-extension: yaml # 默认 properties
+        prefix: aaa
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  # 暴露健康接口的细节
+  endpoint:
+    health:
+      show-details: always
+
+dubbo:
+  scan:
+    # dubbo 服务扫描基准包
+    base-packages: com.shred.sc.service.impl
+  protocol:
+    # dubbo 协议
+    name: dubbo
+    # dubbo 协议端口( -1 表示自增端口，从 20880 开始)
+    port: -1
+    host: 123.98.63.223
+  registry:
+    address: spring-cloud://127.0.0.1
+  cloud:
+    # 订阅服务提供方的应用列表，订阅多个服务提供者使用 "," 连接
+    subscribed-services: service-code
+  consumer:
+    check: false
+  application:
+    name: service-user

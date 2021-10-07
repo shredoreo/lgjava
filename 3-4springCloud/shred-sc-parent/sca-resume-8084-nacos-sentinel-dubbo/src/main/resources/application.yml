@@ -36,7 +36,7 @@ dubbo:
     port: -1
   registry:
     # 挂载到 Spring Cloud 的注册中心 ,也就是nacos的注册中心
-    address: spring-cloud://localhost
+    address: nacos://123.98.63.223:8848
 
 management:
   endpoints:
